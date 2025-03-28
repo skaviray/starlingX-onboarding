@@ -1,0 +1,4 @@
+- hosts: all
+  tasks:
+   - name: Checking uptime
+     shell: uptime

@@ -1,0 +1,12 @@
+  version: '3.9'
+  services:
+    distributed-cloud:
+      image: postgres:14-alpine
+      ports:
+        - 5434:5432
+      volumes:
+        - ~/distributed-cloud/postgres:/var/lib/postgresql/data
+      environment:
+        - POSTGRES_PASSWORD=admin
+        - POSTGRES_USER=root
+        - POSTGRES_DB=distributed-cloud
