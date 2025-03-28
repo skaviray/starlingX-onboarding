@@ -1,0 +1,40 @@
+// import { Nav } from "react-bootstrap";
+
+// const Sidebar = ({ setSelectedEntityType }) => {
+//   return (
+//     <div 
+//       className="d-flex flex-column p-3 bg-light shadow-sm" 
+//       style={{ 
+//         width: "200px", 
+//         height: "calc(100vh - 50px)",  
+//         marginTop: "50px",  
+//         position: "fixed",
+//         left: 0,
+//         top: 0,
+//         overflowY: "auto"
+//       }}
+//     >
+//       <Nav className="flex-column mt-3">
+//         {["Sites", "Nodes", "Deployments"].map((type) => (
+//           <div 
+//             key={type}
+//             className="p-3 my-2 text-center fw-bold rounded shadow-sm"
+//             style={{ 
+//               backgroundColor: "#f8f9fa", 
+//               cursor: "pointer", 
+//               border: "1px solid #ddd",
+//               transition: "all 0.2s ease-in-out"
+//             }}
+//             onClick={() => setSelectedEntityType(type)}
+//             onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#d1e7fd"}
+//             onMouseOut={(e) => e.currentTarget.style.backgroundColor = "#f8f9fa"}
+//           >
+//             {type}
+//           </div>
+//         ))}
+//       </Nav>
+//     </div>
+//   );
+// };
+
+// export default Sidebar;
