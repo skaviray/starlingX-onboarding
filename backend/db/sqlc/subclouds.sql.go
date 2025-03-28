@@ -11,14 +11,17 @@ import (
 
 const createSubcloud = `-- name: CreateSubcloud :one
 INSERT INTO subcloud 
-(name,system_controller_id, ip_address, sync_status) 
-VALUES ($1,$2,$3,$4) RETURNING id, name, system_controller_id, ip_address, sync_status, created_at
+(name,system_controller_id, oam_floating, oam_controller_0, oam_controller_1,config, sync_status) 
+VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id, name, system_controller_id, oam_floating, oam_controller_0, oam_controller_1, config, sync_status, created_at
 `
 
 type CreateSubcloudParams struct {
 	Name               string `json:"name"`
 	SystemControllerID int32  `json:"system_controller_id"`
-	IpAddress          string `json:"ip_address"`
+	OamFloating        string `json:"oam_floating"`
+	OamController0     string `json:"oam_controller_0"`
+	OamController1     string `json:"oam_controller_1"`
+	Config             string `json:"config"`
 	SyncStatus         string `json:"sync_status"`
 }
 
@@ -26,7 +29,10 @@ func (q *Queries) CreateSubcloud(ctx context.Context, arg CreateSubcloudParams) 
 	row := q.db.QueryRowContext(ctx, createSubcloud,
 		arg.Name,
 		arg.SystemControllerID,
-		arg.IpAddress,
+		arg.OamFloating,
+		arg.OamController0,
+		arg.OamController1,
+		arg.Config,
 		arg.SyncStatus,
 	)
 	var i Subcloud
@@ -34,7 +40,10 @@ func (q *Queries) CreateSubcloud(ctx context.Context, arg CreateSubcloudParams) 
 		&i.ID,
 		&i.Name,
 		&i.SystemControllerID,
-		&i.IpAddress,
+		&i.OamFloating,
+		&i.OamController0,
+		&i.OamController1,
+		&i.Config,
 		&i.SyncStatus,
 		&i.CreatedAt,
 	)
@@ -55,7 +64,7 @@ func (q *Queries) DeleteSubcloud(ctx context.Context, id int32) error {
 }
 
 const getSubcloud = `-- name: GetSubcloud :one
-SELECT id, name, system_controller_id, ip_address, sync_status, created_at FROM subcloud
+SELECT id, name, system_controller_id, oam_floating, oam_controller_0, oam_controller_1, config, sync_status, created_at FROM subcloud
 WHERE id = $1
 LIMIT 1
 `
@@ -67,7 +76,10 @@ func (q *Queries) GetSubcloud(ctx context.Context, id int32) (Subcloud, error) {
 		&i.ID,
 		&i.Name,
 		&i.SystemControllerID,
-		&i.IpAddress,
+		&i.OamFloating,
+		&i.OamController0,
+		&i.OamController1,
+		&i.Config,
 		&i.SyncStatus,
 		&i.CreatedAt,
 	)
@@ -75,7 +87,7 @@ func (q *Queries) GetSubcloud(ctx context.Context, id int32) (Subcloud, error) {
 }
 
 const listSubclouds = `-- name: ListSubclouds :many
-SELECT id, name, system_controller_id, ip_address, sync_status, created_at FROM subcloud
+SELECT id, name, system_controller_id, oam_floating, oam_controller_0, oam_controller_1, config, sync_status, created_at FROM subcloud
 ORDER BY id
 `
 
@@ -92,7 +104,10 @@ func (q *Queries) ListSubclouds(ctx context.Context) ([]Subcloud, error) {
 			&i.ID,
 			&i.Name,
 			&i.SystemControllerID,
-			&i.IpAddress,
+			&i.OamFloating,
+			&i.OamController0,
+			&i.OamController1,
+			&i.Config,
 			&i.SyncStatus,
 			&i.CreatedAt,
 		); err != nil {

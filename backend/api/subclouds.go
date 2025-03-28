@@ -9,10 +9,14 @@ import (
 )
 
 type CreateSubcloudReq struct {
-	Name               string `json:"name"`
-	SystemControllerId int32  `json:"system_controller_id" binding:"required"`
-	IpAdress           string `json:"ip_address" binding:"required,ipv4"`
-	SyncStatus         string `json:"sync_status"`
+	Name               string       `json:"name"`
+	SystemControllerId int32        `json:"system_controller_id" binding:"required"`
+	IpAdress           string       `json:"ip_address" binding:"required,ipv4"`
+	OAM_FLOATING_IP    string       `json:"oam_floating" binding:"required,ipv4"`
+	OAM_CONTROLLER_0   string       `json:"oam_controller_0" binding:"required,ipv4"`
+	OAM_CONTROLLER_1   string       `json:"oam_controller_1" binding:"required,ipv4"`
+	CONFIG             SystemConfig `json:"config" binding:"required"`
+	SyncStatus         string       `json:"sync_status"`
 }
 
 func (server *Server) CreateSubcloud(ctx *gin.Context) {
@@ -24,8 +28,12 @@ func (server *Server) CreateSubcloud(ctx *gin.Context) {
 	args := db.CreateSubcloudParams{
 		Name:               scParams.Name,
 		SystemControllerID: scParams.SystemControllerId,
-		IpAddress:          scParams.IpAdress,
-		SyncStatus:         "unknown",
+		OamFloating:        scParams.OAM_FLOATING_IP,
+		OamController0:     scParams.OAM_CONTROLLER_0,
+		OamController1:     scParams.OAM_CONTROLLER_1,
+		Config:             "hello",
+		// IpAddress:          scParams.IpAdress,
+		SyncStatus: "unknown",
 	}
 	Subcloud, err := server.store.CreateSubcloud(ctx, args)
 	if err != nil {

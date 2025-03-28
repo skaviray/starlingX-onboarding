@@ -11,23 +11,36 @@ import (
 
 const createSystemController = `-- name: CreateSystemController :one
 INSERT INTO system_controller 
-(name,ip_address,status) 
-VALUES ($1,$2,$3) RETURNING id, name, ip_address, status, created_at
+(name,oam_floating,oam_controller_0,oam_controller_1,config,status) 
+VALUES ($1,$2,$3,$4,$5,$6) RETURNING id, name, oam_floating, oam_controller_0, oam_controller_1, config, status, created_at
 `
 
 type CreateSystemControllerParams struct {
-	Name      string `json:"name"`
-	IpAddress string `json:"ip_address"`
-	Status    string `json:"status"`
+	Name           string `json:"name"`
+	OamFloating    string `json:"oam_floating"`
+	OamController0 string `json:"oam_controller_0"`
+	OamController1 string `json:"oam_controller_1"`
+	Config         string `json:"config"`
+	Status         string `json:"status"`
 }
 
 func (q *Queries) CreateSystemController(ctx context.Context, arg CreateSystemControllerParams) (SystemController, error) {
-	row := q.db.QueryRowContext(ctx, createSystemController, arg.Name, arg.IpAddress, arg.Status)
+	row := q.db.QueryRowContext(ctx, createSystemController,
+		arg.Name,
+		arg.OamFloating,
+		arg.OamController0,
+		arg.OamController1,
+		arg.Config,
+		arg.Status,
+	)
 	var i SystemController
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
-		&i.IpAddress,
+		&i.OamFloating,
+		&i.OamController0,
+		&i.OamController1,
+		&i.Config,
 		&i.Status,
 		&i.CreatedAt,
 	)
@@ -48,7 +61,7 @@ func (q *Queries) DeleteSystemController(ctx context.Context, id int32) error {
 }
 
 const getSystemController = `-- name: GetSystemController :one
-SELECT id, name, ip_address, status, created_at FROM system_controller
+SELECT id, name, oam_floating, oam_controller_0, oam_controller_1, config, status, created_at FROM system_controller
 WHERE id = $1
 LIMIT 1
 `
@@ -59,7 +72,10 @@ func (q *Queries) GetSystemController(ctx context.Context, id int32) (SystemCont
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
-		&i.IpAddress,
+		&i.OamFloating,
+		&i.OamController0,
+		&i.OamController1,
+		&i.Config,
 		&i.Status,
 		&i.CreatedAt,
 	)
@@ -67,7 +83,7 @@ func (q *Queries) GetSystemController(ctx context.Context, id int32) (SystemCont
 }
 
 const listSystemController = `-- name: ListSystemController :many
-SELECT id, name, ip_address, status, created_at FROM system_controller
+SELECT id, name, oam_floating, oam_controller_0, oam_controller_1, config, status, created_at FROM system_controller
 ORDER BY id
 `
 
@@ -83,7 +99,10 @@ func (q *Queries) ListSystemController(ctx context.Context) ([]SystemController,
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
-			&i.IpAddress,
+			&i.OamFloating,
+			&i.OamController0,
+			&i.OamController1,
+			&i.Config,
 			&i.Status,
 			&i.CreatedAt,
 		); err != nil {

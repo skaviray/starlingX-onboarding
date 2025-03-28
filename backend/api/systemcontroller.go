@@ -9,10 +9,44 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type NodeConfig struct {
+	BM_IP       string   `json:"bm_ip" binding:"required,ipv4"`
+	BM_USER     string   `json:"bm_user" binding:"required"`
+	BM_PASS     string   `json:"bm_pass" binding:"required"`
+	BM_TYPE     string   `json:"bm_type" binding:"required"`
+	PERSONALITY string   `json:"personality" binding:"required oneof=controller storage worker"`
+	PXE_DEVICE  string   `json:"pxe_device" binding:"required"`
+	PXE         string   `json:"pxe" binding:"required"`
+	CEPH_DISKS  []string `json:"ceph_disks" binding:"required"`
+	ROOT_DISK   []string `json:"root_disk" binding:"required"`
+	HostName    string   `json:"hostname"`
+	// SUBFUNCTIONS string `json:"subfuctions"`
+}
+
+type NetworkConfig struct {
+	OAM          string `json:"oam" binding:"required,cidr"`
+	CLUSTER_HOST string `json:"cluster_host" binding:"required,cidr"`
+	MANAGEMENT   string `json:"mgmt" binding:"required,cidr"`
+	ADMIN        string `json:"admin" binding:"required,cidr"`
+}
+
+type SystemConfig struct {
+	Type        string        `json:"type" binding:"oneof=system-controller subcloud"`
+	Controllers []NodeConfig  `json:"controllers"`
+	Storages    []NodeConfig  `json:"storages"`
+	Workers     []NodeConfig  `json:"workers"`
+	Network     NetworkConfig `json:"network_config"`
+	Ntp_Servers []string      `json:"ntp_Servers" binding:"required,ipv4"`
+	DNS_Servers []string      `json:"dns_Servers" binding:"required,ipv4"`
+}
+
 type CreateSystemControllerReq struct {
-	Name     string `json:"name"`
-	IpAdress string `json:"ip_address" binding:"required,ipv4"`
-	Status   string `json:"status"`
+	Name             string       `json:"name"`
+	OAM_FLOATING_IP  string       `json:"oam_floating" binding:"required,ipv4"`
+	OAM_CONTROLLER_0 string       `json:"oam_controller_0" binding:"required,ipv4"`
+	OAM_CONTROLLER_1 string       `json:"oam_controller_1" binding:"required,ipv4"`
+	CONFIG           SystemConfig `json:"config" binding:"required"`
+	Status           string       `json:"status"`
 }
 
 func (server *Server) CreateSystemController(ctx *gin.Context) {
@@ -22,9 +56,12 @@ func (server *Server) CreateSystemController(ctx *gin.Context) {
 		return
 	}
 	args := db.CreateSystemControllerParams{
-		Name:      scParams.Name,
-		IpAddress: scParams.IpAdress,
-		Status:    "deploying",
+		Name:           scParams.Name,
+		OamFloating:    scParams.OAM_FLOATING_IP,
+		OamController0: scParams.OAM_CONTROLLER_0,
+		OamController1: scParams.OAM_CONTROLLER_1,
+		Config:         "hello",
+		Status:         "deploying",
 	}
 	systemController, err := server.store.CreateSystemController(ctx, args)
 	if err != nil {

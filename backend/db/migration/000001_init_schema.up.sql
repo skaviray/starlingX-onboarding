@@ -12,7 +12,10 @@ CREATE TABLE "users" (
 CREATE TABLE system_controller (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) UNIQUE NOT NULL,
-    ip_address VARCHAR(45) UNIQUE NOT NULL,
+    oam_floating VARCHAR(45) UNIQUE NOT NULL,
+    oam_controller_0  VARCHAR(45) UNIQUE NOT NULL,
+    oam_controller_1  VARCHAR(45) UNIQUE NOT NULL,
+    config VARCHAR(45) NOT NULL,
     status VARCHAR(50) CHECK (status IN ('active', 'maintenance', 'error', 'deploying')) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -22,7 +25,10 @@ CREATE TABLE subcloud (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) UNIQUE NOT NULL,
     system_controller_id INT REFERENCES system_controller(id) ON DELETE CASCADE NOT NULL,
-    ip_address VARCHAR(45) UNIQUE NOT NULL,
+    oam_floating VARCHAR(45) UNIQUE NOT NULL,
+    oam_controller_0  VARCHAR(45) UNIQUE NOT NULL,
+    oam_controller_1  VARCHAR(45) UNIQUE NOT NULL,
+    config VARCHAR(45) NOT NULL,
     sync_status VARCHAR(50) CHECK (sync_status IN ('in-sync', 'out-of-sync', 'unknown')) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );

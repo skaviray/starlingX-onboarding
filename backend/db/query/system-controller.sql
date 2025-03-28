@@ -1,7 +1,7 @@
 -- name: CreateSystemController :one
 INSERT INTO system_controller 
-(name,ip_address,status) 
-VALUES ($1,$2,$3) RETURNING *;
+(name,oam_floating,oam_controller_0,oam_controller_1,config,status) 
+VALUES ($1,$2,$3,$4,$5,$6) RETURNING *;
 
 -- name: GetSystemController :one
 SELECT * FROM system_controller

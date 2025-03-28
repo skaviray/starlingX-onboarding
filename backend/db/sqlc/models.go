@@ -43,17 +43,23 @@ type Subcloud struct {
 	ID                 int32     `json:"id"`
 	Name               string    `json:"name"`
 	SystemControllerID int32     `json:"system_controller_id"`
-	IpAddress          string    `json:"ip_address"`
+	OamFloating        string    `json:"oam_floating"`
+	OamController0     string    `json:"oam_controller_0"`
+	OamController1     string    `json:"oam_controller_1"`
+	Config             string    `json:"config"`
 	SyncStatus         string    `json:"sync_status"`
 	CreatedAt          time.Time `json:"created_at"`
 }
 
 type SystemController struct {
-	ID        int32        `json:"id"`
-	Name      string       `json:"name"`
-	IpAddress string       `json:"ip_address"`
-	Status    string       `json:"status"`
-	CreatedAt sql.NullTime `json:"created_at"`
+	ID             int32        `json:"id"`
+	Name           string       `json:"name"`
+	OamFloating    string       `json:"oam_floating"`
+	OamController0 string       `json:"oam_controller_0"`
+	OamController1 string       `json:"oam_controller_1"`
+	Config         string       `json:"config"`
+	Status         string       `json:"status"`
+	CreatedAt      sql.NullTime `json:"created_at"`
 }
 
 type User struct {

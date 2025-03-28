@@ -1,7 +1,7 @@
 -- name: CreateSubcloud :one
 INSERT INTO subcloud 
-(name,system_controller_id, ip_address, sync_status) 
-VALUES ($1,$2,$3,$4) RETURNING *;
+(name,system_controller_id, oam_floating, oam_controller_0, oam_controller_1,config, sync_status) 
+VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *;
 
 -- name: GetSubcloud :one
 SELECT * FROM subcloud
