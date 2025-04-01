@@ -43,17 +43,17 @@ func (server *Server) CreateSubcloud(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, Subcloud)
 }
 
-type ListSubcloudParams struct {
-	PageId   int32 `form:"page_id" binding:"required,min=1"`
-	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
-}
+// type ListSubcloudParams struct {
+// 	PageId   int32 `form:"page_id" binding:"required,min=1"`
+// 	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
+// }
 
 func (server *Server) ListSubclouds(ctx *gin.Context) {
-	var params ListSubcloudParams
-	if err := ctx.ShouldBindQuery(&params); err != nil {
-		ctx.JSON(http.StatusBadRequest, utils.ErrorResponse(err))
-		return
-	}
+	// var params ListSubcloudParams
+	// if err := ctx.ShouldBindQuery(&params); err != nil {
+	// 	ctx.JSON(http.StatusBadRequest, utils.ErrorResponse(err))
+	// 	return
+	// }
 	// args := db.ListSubcloudsParams{
 	// 	Limit:  params.PageSize,
 	// 	Offset: params.PageId,
