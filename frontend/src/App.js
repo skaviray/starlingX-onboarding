@@ -1,16 +1,33 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Login from "./Login";
-import Dashboard from "./Dashboard";
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './pages/Login';
+import Layout from './components/Layout';
+import ProtectedRoute from './components/ProtectedRoute';
+import SystemControllerDetail from './pages/SystemControllerDetail';
+import SystemController from './pages/SystemController';  
+import Subclouds from './pages/Subclouds';
+import Nodes from './pages/Nodes';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.css';
 
-const App = () => (
-  <Router>
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="*" element={<Navigate to="/login" />} />
-    </Routes>
-  </Router>
-);
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<Navigate to="/systemcontroller" replace />} />
+          <Route path="systemcontroller" element={<SystemController />} />
+          <Route path="systemcontroller/:id" element={<SystemControllerDetail />} />
+          <Route path="subclouds" element={<Subclouds />} />
+          <Route path="nodes" element={<Nodes />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+}
 
 export default App;
