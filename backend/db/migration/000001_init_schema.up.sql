@@ -15,7 +15,7 @@ CREATE TABLE system_controller (
     oam_floating VARCHAR(45) UNIQUE NOT NULL,
     oam_controller_0  VARCHAR(45) UNIQUE NOT NULL,
     oam_controller_1  VARCHAR(45) UNIQUE NOT NULL,
-    config VARCHAR(45) NOT NULL,
+    config JSONB NOT NULL,
     status VARCHAR(50) CHECK (status IN ('active', 'maintenance', 'error', 'deploying')) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -28,7 +28,7 @@ CREATE TABLE subcloud (
     oam_floating VARCHAR(45) UNIQUE NOT NULL,
     oam_controller_0  VARCHAR(45) UNIQUE NOT NULL,
     oam_controller_1  VARCHAR(45) UNIQUE NOT NULL,
-    config VARCHAR(45) NOT NULL,
+    config JSONB NOT NULL,
     sync_status VARCHAR(50) CHECK (sync_status IN ('in-sync', 'out-of-sync', 'unknown')) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -38,12 +38,12 @@ CREATE TABLE nodes (
     name VARCHAR(255) NOT NULL,
     hostname VARCHAR(255) NOT NULL,
     bm_ip VARCHAR(45) UNIQUE NOT NULL,
-    bm_user VARCHAR(45) UNIQUE NOT NULL,
-    bm_pass VARCHAR(45) UNIQUE NOT NULL,
+    bm_user VARCHAR(45) NOT NULL,
+    bm_pass VARCHAR(255) NOT NULL,
     role VARCHAR(50) CHECK (role IN ('controller', 'worker', 'storage', 'aio')) NOT NULL,
     parent_type VARCHAR(50) CHECK (parent_type IN ('system_controller', 'subcloud')) NOT NULL,
     parent_id INT NOT NULL,  -- Foreign key reference based on parent_type
-    status VARCHAR(255) NOT NULL,
+    status VARCHAR(255) NOT NULL DEFAULT 'provisioning',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 

@@ -19,3 +19,6 @@ sql:
   #   managed: true
   rules:
     - sqlc/db-prepare
+  # overrides:
+  #   - db_type: "jsonb"
+  #     go_type: "string"

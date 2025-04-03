@@ -3,6 +3,8 @@ package api
 import (
 	db "api/db/sqlc"
 	"api/utils"
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -55,20 +57,153 @@ func (server *Server) CreateSystemController(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, utils.ErrorResponse(err))
 		return
 	}
+	
+	// Serialize config to JSON
+	configJSON, err := json.Marshal(scParams.CONFIG)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
+		return
+	}
+	
 	args := db.CreateSystemControllerParams{
 		Name:           scParams.Name,
 		OamFloating:    scParams.OAM_FLOATING_IP,
 		OamController0: scParams.OAM_CONTROLLER_0,
 		OamController1: scParams.OAM_CONTROLLER_1,
-		Config:         "hello",
+		Config:         configJSON, // Use the raw JSON bytes
 		Status:         "deploying",
 	}
+	
 	systemController, err := server.store.CreateSystemController(ctx, args)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
-	ctx.JSON(http.StatusOK, systemController)
+	
+	// Create nodes from the config
+	createdNodes := []db.Node{}
+	
+	// Process controller nodes
+	for i, controllerConfig := range scParams.CONFIG.Controllers {
+		nodeName := systemController.Name + "-controller-" + fmt.Sprintf("%d", i)
+		
+		hostname := controllerConfig.HostName
+		if hostname == "" {
+			hostname = nodeName
+		}
+		
+		hashedPass, err := utils.CreateHashedPassword(controllerConfig.BM_PASS)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
+			return
+		}
+		
+		nodeArgs := db.CreateNodeParams{
+			Name:       nodeName,
+			Hostname:   hostname,
+			BmIp:       controllerConfig.BM_IP,
+			BmUser:     controllerConfig.BM_USER,
+			BmPass:     hashedPass,
+			Role:       "controller",
+			ParentType: "system_controller",
+			ParentID:   systemController.ID,
+		}
+		
+		node, err := server.store.CreateNode(ctx, nodeArgs)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
+			return
+		}
+		
+		createdNodes = append(createdNodes, node)
+	}
+	
+	// Process storage nodes
+	for i, storageConfig := range scParams.CONFIG.Storages {
+		nodeName := systemController.Name + "-storage-" + fmt.Sprintf("%d", i)
+		
+		// Use the hostname if provided, otherwise generate one
+		hostname := storageConfig.HostName
+		if hostname == "" {
+			hostname = nodeName
+		}
+		
+		// Create the storage node
+		hashedPass, err := utils.CreateHashedPassword(storageConfig.BM_PASS)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
+			return
+		}
+		
+		nodeArgs := db.CreateNodeParams{
+			Name:       nodeName,
+			Hostname:   hostname,
+			BmIp:       storageConfig.BM_IP,
+			BmUser:     storageConfig.BM_USER,
+			BmPass:     hashedPass,
+			Role:       "storage",
+			ParentType: "system_controller",
+			ParentID:   systemController.ID,
+		}
+		
+		node, err := server.store.CreateNode(ctx, nodeArgs)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
+			return
+		}
+		
+		createdNodes = append(createdNodes, node)
+	}
+	
+	// Process worker nodes
+	for i, workerConfig := range scParams.CONFIG.Workers {
+		nodeName := systemController.Name + "-worker-" + fmt.Sprintf("%d", i)
+		
+		// Use the hostname if provided, otherwise generate one
+		hostname := workerConfig.HostName
+		if hostname == "" {
+			hostname = nodeName
+		}
+		
+		// Create the worker node
+		hashedPass, err := utils.CreateHashedPassword(workerConfig.BM_PASS)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
+			return
+		}
+		
+		nodeArgs := db.CreateNodeParams{
+			Name:       nodeName,
+			Hostname:   hostname,
+			BmIp:       workerConfig.BM_IP,
+			BmUser:     workerConfig.BM_USER,
+			BmPass:     hashedPass,
+			Role:       "worker",
+			ParentType: "system_controller",
+			ParentID:   systemController.ID,
+		}
+		
+		node, err := server.store.CreateNode(ctx, nodeArgs)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
+			return
+		}
+		
+		createdNodes = append(createdNodes, node)
+	}
+	
+	// Return enhanced response
+	type EnhancedSystemControllerResponse struct {
+		SystemController db.SystemController `json:"system_controller"`
+		Nodes            []db.Node           `json:"nodes"`
+	}
+	
+	response := EnhancedSystemControllerResponse{
+		SystemController: systemController,
+		Nodes:            createdNodes,
+	}
+	
+	ctx.JSON(http.StatusOK, response)
 }
 
 // type ListSystemControllerParams struct {

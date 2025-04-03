@@ -27,7 +27,8 @@ migrate-down:
 	migrate -path db/migration -database "postgresql://root:admin@localhost:5434/distributed-cloud?sslmode=disable" -verbose down 
 
 sqlc:
-	sqlc generate 
+	go run github.com/sqlc-dev/sqlc/cmd/sqlc generate
+	//docker run --rm -v "C:\Users\skaviray\Documents\Cursor\starlingX-onboarding\backend:/src" -w /src sqlc/sqlc generate
 
 test:
 	go test -v -cover ./...

@@ -31,7 +31,7 @@ func (server *Server) CreateSubcloud(ctx *gin.Context) {
 		OamFloating:        scParams.OAM_FLOATING_IP,
 		OamController0:     scParams.OAM_CONTROLLER_0,
 		OamController1:     scParams.OAM_CONTROLLER_1,
-		Config:             "hello",
+		// Config:             "hello",
 		// IpAddress:          scParams.IpAdress,
 		SyncStatus: "unknown",
 	}
