@@ -36,8 +36,8 @@ type SystemConfig struct {
 	Storages    []NodeConfig  `json:"storages"`
 	Workers     []NodeConfig  `json:"workers"`
 	Network     NetworkConfig `json:"network_config"`
-	Ntp_Servers []string      `json:"ntp_Servers" binding:"required,ipv4"`
-	DNS_Servers []string      `json:"dns_Servers" binding:"required,ipv4"`
+	Ntp_Servers []string      `json:"ntp_Servers" binding:"required"`
+	DNS_Servers []string      `json:"dns_Servers" binding:"required"`
 }
 
 type CreateSystemControllerReq struct {
