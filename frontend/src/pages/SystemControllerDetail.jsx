@@ -93,7 +93,7 @@ function SystemControllerDetail() {
             <div className="card-body">
               <h5 className="card-title">Overview</h5>
               <div className="row">
-                <div className="col-md-6">
+                <div className="col-md-12">
                   <table className="table">
                     <tbody>
                       <tr>
@@ -105,41 +105,85 @@ function SystemControllerDetail() {
                         <td>{controller.name}</td>
                       </tr>
                       <tr>
+                        <th>OAM Floating</th>
+                        <td>{controller.oam_floating}</td>
+                      </tr>
+                      <tr>
+                        <th>OAM Controller 0</th>
+                        <td>{controller.oam_controller_0}</td>
+                      </tr>
+                      <tr>
+                        <th>OAM Controller 1</th>
+                        <td>{controller.oam_controller_1}</td>
+                      </tr>
+                      <tr>
                         <th>Status</th>
                         <td>
                           <span className={`badge ${
-                            controller.status === "Active" ? "bg-success" :
-                            controller.status === "Inactive" ? "bg-danger" :
-                            "bg-warning"
+                            controller.status === "active" ? "bg-success" :
+                            controller.status === "maintenance" ? "bg-warning" :
+                            controller.status === "error" ? "bg-danger" :
+                            "bg-info"
                           }`}>
                             {controller.status}
                           </span>
                         </td>
                       </tr>
                       <tr>
-                        <th>Last Updated</th>
-                        <td>{new Date(controller.lastUpdated || Date.now()).toLocaleString()}</td>
+                        <th>Inventoried</th>
+                        <td>{controller.is_inventoried ? 'Yes' : 'No'}</td>
+                      </tr>
+                      <tr>
+                        <th>Created At</th>
+                        <td>{new Date(controller.created_at).toLocaleString()}</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
-                <div className="col-md-6">
-                  <h6>System Resources</h6>
-                  <div className="progress mb-2">
-                    <div className="progress-bar" role="progressbar" style={{ width: `${controller.cpuUsage || 0}%` }}>
-                      CPU: {controller.cpuUsage || 0}%
-                    </div>
-                  </div>
-                  <div className="progress mb-2">
-                    <div className="progress-bar" role="progressbar" style={{ width: `${controller.memoryUsage || 0}%` }}>
-                      Memory: {controller.memoryUsage || 0}%
-                    </div>
-                  </div>
-                  <div className="progress">
-                    <div className="progress-bar" role="progressbar" style={{ width: `${controller.storageUsage || 0}%` }}>
-                      Storage: {controller.storageUsage || 0}%
-                    </div>
-                  </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "overview" && (
+          <div className="card mt-4">
+            <div className="card-body">
+              <h5 className="card-title">Configuration</h5>
+              <div className="row">
+                <div className="col-md-12">
+                  <h6>Network Configuration</h6>
+                  <table className="table">
+                    <tbody>
+                      <tr>
+                        <th>OAM</th>
+                        <td>{controller.config.network_config.oam}</td>
+                      </tr>
+                      <tr>
+                        <th>Cluster Host</th>
+                        <td>{controller.config.network_config.cluster_host}</td>
+                      </tr>
+                      <tr>
+                        <th>Management</th>
+                        <td>{controller.config.network_config.mgmt}</td>
+                      </tr>
+                      <tr>
+                        <th>Admin</th>
+                        <td>{controller.config.network_config.admin}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <h6>NTP Servers</h6>
+                  <ul>
+                    {controller.config.ntp_Servers.map((server, index) => (
+                      <li key={index}>{server}</li>
+                    ))}
+                  </ul>
+                  <h6>DNS Servers</h6>
+                  <ul>
+                    {controller.config.dns_Servers.map((server, index) => (
+                      <li key={index}>{server}</li>
+                    ))}
+                  </ul>
                 </div>
               </div>
             </div>
