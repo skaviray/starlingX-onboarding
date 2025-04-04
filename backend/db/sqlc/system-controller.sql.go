@@ -13,7 +13,7 @@ import (
 const createSystemController = `-- name: CreateSystemController :one
 INSERT INTO system_controller 
 (name,oam_floating,oam_controller_0,oam_controller_1,config,status) 
-VALUES ($1,$2,$3,$4,$5,$6) RETURNING id, name, oam_floating, oam_controller_0, oam_controller_1, config, status, created_at
+VALUES ($1,$2,$3,$4,$5,$6) RETURNING id, name, oam_floating, oam_controller_0, oam_controller_1, config, status, is_inventoried, created_at
 `
 
 type CreateSystemControllerParams struct {
@@ -43,6 +43,7 @@ func (q *Queries) CreateSystemController(ctx context.Context, arg CreateSystemCo
 		&i.OamController1,
 		&i.Config,
 		&i.Status,
+		&i.IsInventoried,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -62,7 +63,7 @@ func (q *Queries) DeleteSystemController(ctx context.Context, id int32) error {
 }
 
 const getSystemController = `-- name: GetSystemController :one
-SELECT id, name, oam_floating, oam_controller_0, oam_controller_1, config, status, created_at FROM system_controller
+SELECT id, name, oam_floating, oam_controller_0, oam_controller_1, config, status, is_inventoried, created_at FROM system_controller
 WHERE id = $1
 LIMIT 1
 `
@@ -78,13 +79,14 @@ func (q *Queries) GetSystemController(ctx context.Context, id int32) (SystemCont
 		&i.OamController1,
 		&i.Config,
 		&i.Status,
+		&i.IsInventoried,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const listSystemController = `-- name: ListSystemController :many
-SELECT id, name, oam_floating, oam_controller_0, oam_controller_1, config, status, created_at FROM system_controller
+SELECT id, name, oam_floating, oam_controller_0, oam_controller_1, config, status, is_inventoried, created_at FROM system_controller
 ORDER BY id
 `
 
@@ -105,6 +107,7 @@ func (q *Queries) ListSystemController(ctx context.Context) ([]SystemController,
 			&i.OamController1,
 			&i.Config,
 			&i.Status,
+			&i.IsInventoried,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err
@@ -118,4 +121,33 @@ func (q *Queries) ListSystemController(ctx context.Context) ([]SystemController,
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateSystemControllerInventory = `-- name: UpdateSystemControllerInventory :one
+UPDATE system_controller
+SET is_inventoried = $2
+WHERE id = $1
+RETURNING id, name, oam_floating, oam_controller_0, oam_controller_1, config, status, is_inventoried, created_at
+`
+
+type UpdateSystemControllerInventoryParams struct {
+	ID            int32 `json:"id"`
+	IsInventoried bool  `json:"is_inventoried"`
+}
+
+func (q *Queries) UpdateSystemControllerInventory(ctx context.Context, arg UpdateSystemControllerInventoryParams) (SystemController, error) {
+	row := q.db.QueryRowContext(ctx, updateSystemControllerInventory, arg.ID, arg.IsInventoried)
+	var i SystemController
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.OamFloating,
+		&i.OamController0,
+		&i.OamController1,
+		&i.Config,
+		&i.Status,
+		&i.IsInventoried,
+		&i.CreatedAt,
+	)
+	return i, err
 }

@@ -17,3 +17,9 @@ ORDER BY id;
 -- name: DeleteSystemController :exec
 DELETE FROM system_controller
 WHERE id = $1;
+
+-- name: UpdateSystemControllerInventory :one
+UPDATE system_controller
+SET is_inventoried = $2
+WHERE id = $1
+RETURNING *;

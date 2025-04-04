@@ -6,6 +6,7 @@ import SystemControllerDetail from './pages/SystemControllerDetail';
 import SystemController from './pages/SystemController';  
 import Subclouds from './pages/Subclouds';
 import Nodes from './pages/Nodes';
+import NodeDetail from './pages/NodeDetail';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -24,6 +25,7 @@ function App() {
           <Route path="systemcontroller/:id" element={<SystemControllerDetail />} />
           <Route path="subclouds" element={<Subclouds />} />
           <Route path="nodes" element={<Nodes />} />
+          <Route path="nodes/:id" element={<NodeDetail />} />
         </Route>
       </Routes>
     </BrowserRouter>

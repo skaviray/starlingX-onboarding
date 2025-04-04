@@ -17,6 +17,7 @@ CREATE TABLE system_controller (
     oam_controller_1  VARCHAR(45) UNIQUE NOT NULL,
     config JSONB NOT NULL,
     status VARCHAR(50) CHECK (status IN ('active', 'maintenance', 'error', 'deploying')) NOT NULL,
+    is_inventoried BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

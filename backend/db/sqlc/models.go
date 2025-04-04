@@ -60,6 +60,7 @@ type SystemController struct {
 	OamController1 string          `json:"oam_controller_1"`
 	Config         json.RawMessage `json:"config"`
 	Status         string          `json:"status"`
+	IsInventoried  bool            `json:"is_inventoried"`
 	CreatedAt      sql.NullTime    `json:"created_at"`
 }
 

@@ -13,7 +13,7 @@ import (
 func main() {
 	config, err := utils.LoadConfig(".")
 	if err != nil {
-		log.Fatalf("unable to load the config fie %e", err)
+		log.Fatalf("unable to load the config file %e", err)
 	}
 
 	conn, err := sql.Open(config.DBDriver, config.DBSource)
@@ -22,6 +22,13 @@ func main() {
 	}
 	log.Println("successfully connected to database..")
 	store := db.NewStore(conn)
+	
+	// Create default admin user during startup
+	if err := utils.CreateDefaultAdminUser(store); err != nil {
+		log.Printf("Warning: Failed to create admin user: %v", err)
+		// Continue application startup even if admin creation fails
+	}
+	
 	server, err := api.New(store, config)
 	if err != nil {
 		log.Println(err)
