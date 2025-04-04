@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
-import { InputGroup, Form } from 'react-bootstrap';
+import { InputGroup, Form, Container, Row, Col, Card } from 'react-bootstrap';
 
 function Login() {
   const navigate = useNavigate();
@@ -34,71 +34,89 @@ function Login() {
     }
   };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setCredentials({
+      ...credentials,
+      [name]: value
+    });
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
-    <div className="container">
-      <div className="row justify-content-center align-items-center min-vh-100">
-        <div className="col-md-6 col-lg-4">
-          <div className="card shadow">
-            <div className="card-body p-5">
-              <h2 className="text-center mb-4">Login</h2>
+    <Container fluid className="vh-100 d-flex align-items-center justify-content-center bg-light">
+      <Row className="w-100 justify-content-center">
+        <Col xs={12} md={6} lg={4}>
+          <Card className="shadow-sm">
+            <Card.Body className="p-4">
+              <div className="text-center mb-4">
+                <img 
+                  src="https://starlingx.io//static/f00290a68d8dc5c7cbd19cfd351da028/android-chrome-192x192.png" 
+                  alt="StarlingX Logo" 
+                  className="img-fluid mb-3" 
+                  style={{ maxWidth: '220px' }}
+                />
+                <h3 className="fw-bold">Login</h3>
+              </div>
+
               {error && (
                 <div className="alert alert-danger" role="alert">
                   {error}
                 </div>
               )}
-              <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                  <label htmlFor="username" className="form-label">Username</label>
-                  <input
+
+              <Form onSubmit={handleSubmit}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Username</Form.Label>
+                  <Form.Control
                     type="text"
-                    className="form-control"
-                    id="username"
+                    name="username"
+                    placeholder="Enter your username"
                     value={credentials.username}
-                    onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
+                    onChange={handleChange}
                     required
-                    disabled={isLoading}
                   />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="password" className="form-label">Password</label>
+                </Form.Group>
+
+                <Form.Group className="mb-4">
+                  <Form.Label>Password</Form.Label>
                   <InputGroup>
                     <Form.Control
                       type={showPassword ? "text" : "password"}
-                      id="password"
+                      name="password"
+                      placeholder="Enter your password"
                       value={credentials.password}
-                      onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+                      onChange={handleChange}
                       required
-                      disabled={isLoading}
                     />
-                    <InputGroup.Text 
-                      className="cursor-pointer"
-                      onClick={() => setShowPassword(!showPassword)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      {showPassword ? '👁️' : '👁️‍🗨️'}
+                    <InputGroup.Text onClick={togglePasswordVisibility} style={{ cursor: 'pointer' }}>
+                      {showPassword ? "Hide" : "Show"}
                     </InputGroup.Text>
                   </InputGroup>
-                </div>
-                <button 
-                  type="submit" 
-                  className="btn btn-primary w-100"
+                </Form.Group>
+
+                <button
+                  type="submit"
+                  className="btn btn-primary w-100 py-2"
                   disabled={isLoading}
                 >
-                  {isLoading ? (
-                    <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                      Logging in...
-                    </>
-                  ) : (
-                    'Login'
-                  )}
+                  {isLoading ? 'Signing in...' : 'Sign In'}
                 </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+              </Form>
+              
+              <div className="text-center mt-4">
+                <p className="text-muted small">
+                  StarlingX Distributed Cloud Dashboard v1.0
+                </p>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
   );
 }
 
