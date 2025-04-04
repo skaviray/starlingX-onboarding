@@ -5,7 +5,7 @@ import (
 	"api/utils"
 	"encoding/json"
 	"fmt"
-	"log"
+	// "log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -253,7 +253,7 @@ func (server *Server) ListSystemControllers(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
-	log.Println(systemControllers)
+	// log.Println(systemControllers)
 	ctx.JSON(http.StatusOK, systemControllers)
 }
 
