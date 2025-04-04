@@ -80,6 +80,48 @@ func (q *Queries) DeleteNode(ctx context.Context, id int32) error {
 	return err
 }
 
+const getControllerNodesBySystemControllerID = `-- name: GetControllerNodesBySystemControllerID :many
+SELECT id, name, hostname, bm_ip, bm_user, bm_pass, role, parent_type, parent_id, status, created_at
+FROM nodes
+WHERE parent_type = 'system_controller' AND parent_id = $1 AND role = 'controller'
+ORDER BY id
+`
+
+func (q *Queries) GetControllerNodesBySystemControllerID(ctx context.Context, parentID int32) ([]Node, error) {
+	rows, err := q.db.QueryContext(ctx, getControllerNodesBySystemControllerID, parentID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Node{}
+	for rows.Next() {
+		var i Node
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Hostname,
+			&i.BmIp,
+			&i.BmUser,
+			&i.BmPass,
+			&i.Role,
+			&i.ParentType,
+			&i.ParentID,
+			&i.Status,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getNodeById = `-- name: GetNodeById :one
 SELECT id, name, hostname, bm_ip, bm_user, bm_pass, role, parent_type, parent_id, status, created_at FROM nodes
 WHERE id = $1 LIMIT 1
@@ -102,6 +144,90 @@ func (q *Queries) GetNodeById(ctx context.Context, id int32) (Node, error) {
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const getStorageNodesBySystemControllerID = `-- name: GetStorageNodesBySystemControllerID :many
+SELECT id, name, hostname, bm_ip, bm_user, bm_pass, role, parent_type, parent_id, status, created_at
+FROM nodes
+WHERE parent_type = 'system_controller' AND parent_id = $1 AND role = 'storage'
+ORDER BY id
+`
+
+func (q *Queries) GetStorageNodesBySystemControllerID(ctx context.Context, parentID int32) ([]Node, error) {
+	rows, err := q.db.QueryContext(ctx, getStorageNodesBySystemControllerID, parentID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Node{}
+	for rows.Next() {
+		var i Node
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Hostname,
+			&i.BmIp,
+			&i.BmUser,
+			&i.BmPass,
+			&i.Role,
+			&i.ParentType,
+			&i.ParentID,
+			&i.Status,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getWorkerNodesBySystemControllerID = `-- name: GetWorkerNodesBySystemControllerID :many
+SELECT id, name, hostname, bm_ip, bm_user, bm_pass, role, parent_type, parent_id, status, created_at
+FROM nodes
+WHERE parent_type = 'system_controller' AND parent_id = $1 AND role = 'worker'
+ORDER BY id
+`
+
+func (q *Queries) GetWorkerNodesBySystemControllerID(ctx context.Context, parentID int32) ([]Node, error) {
+	rows, err := q.db.QueryContext(ctx, getWorkerNodesBySystemControllerID, parentID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Node{}
+	for rows.Next() {
+		var i Node
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Hostname,
+			&i.BmIp,
+			&i.BmUser,
+			&i.BmPass,
+			&i.Role,
+			&i.ParentType,
+			&i.ParentID,
+			&i.Status,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listNodes = `-- name: ListNodes :many

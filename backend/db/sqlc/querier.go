@@ -27,10 +27,13 @@ type Querier interface {
 	// OFFSET $2;
 	DeleteSystemController(ctx context.Context, id int32) error
 	GetBiosAttr(ctx context.Context, id int32) (BiosSetting, error)
+	GetControllerNodesBySystemControllerID(ctx context.Context, parentID int32) ([]Node, error)
 	GetNodeById(ctx context.Context, id int32) (Node, error)
+	GetStorageNodesBySystemControllerID(ctx context.Context, parentID int32) ([]Node, error)
 	GetSubcloud(ctx context.Context, id int32) (Subcloud, error)
 	GetSystemController(ctx context.Context, id int32) (SystemController, error)
 	GetUser(ctx context.Context, username string) (User, error)
+	GetWorkerNodesBySystemControllerID(ctx context.Context, parentID int32) ([]Node, error)
 	ListBiosAttr(ctx context.Context, arg ListBiosAttrParams) ([]BiosSetting, error)
 	ListNodes(ctx context.Context, arg ListNodesParams) ([]Node, error)
 	ListSubclouds(ctx context.Context) ([]Subcloud, error)

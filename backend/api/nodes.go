@@ -119,6 +119,8 @@ func (server *Server) GetNodeById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
+
+
 func (server *Server) DeleteNode(ctx *gin.Context) {
 
 }

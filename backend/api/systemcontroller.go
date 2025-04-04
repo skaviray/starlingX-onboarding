@@ -7,6 +7,7 @@ import (
 	"fmt"
 	// "log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -275,6 +276,58 @@ func (server *Server) GetSystemControllerById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, systemController)
 }
 
+
+func (server *Server) GetControllerNodesBySystemControllerID(ctx *gin.Context) {
+	idParam := ctx.Param("id")
+	systemControllerID, err := strconv.Atoi(idParam)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid system controller ID"})
+		return
+	}
+
+	nodes, err := server.store.GetControllerNodesBySystemControllerID(ctx, int32(systemControllerID))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve controller nodes"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, nodes)
+}
+
+func (server *Server) GetStorageNodesBySystemControllerID(ctx *gin.Context) {
+	idParam := ctx.Param("id")
+	systemControllerID, err := strconv.Atoi(idParam)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid system controller ID"})
+		return
+	}
+
+	nodes, err := server.store.GetStorageNodesBySystemControllerID(ctx, int32(systemControllerID))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve storage nodes"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, nodes)
+}
+
+func (server *Server) GetWorkerNodesBySystemControllerID(ctx *gin.Context) {
+	idParam := ctx.Param("id")
+	systemControllerID, err := strconv.Atoi(idParam)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid system controller ID"})
+		return
+	}
+
+	nodes, err := server.store.GetWorkerNodesBySystemControllerID(ctx, int32(systemControllerID))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve worker nodes"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, nodes)
+}
+
 func (server *Server) DeleteSystemController(ctx *gin.Context) {
 	var params SystemControllerByIdParams
 	if err := ctx.ShouldBindUri(&params); err != nil {
@@ -290,3 +343,4 @@ func (server *Server) DeleteSystemController(ctx *gin.Context) {
 	
 	ctx.JSON(http.StatusOK, gin.H{"message": "System controller deleted successfully"})
 }
+

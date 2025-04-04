@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -53,6 +54,9 @@ func (server *Server) setupRouter() {
 	addRoutes.POST("/systemcontrollers", server.CreateSystemController)
 	addRoutes.GET("/systemcontrollers", server.ListSystemControllers)
 	addRoutes.GET("/systemcontrollers/:id", server.GetSystemControllerById)
+	addRoutes.GET("/systemcontrollers/:id/controllers", server.GetControllerNodesBySystemControllerID)
+	addRoutes.GET("/systemcontrollers/:id/storages", server.GetStorageNodesBySystemControllerID)
+	addRoutes.GET("/systemcontrollers/:id/workers", server.GetWorkerNodesBySystemControllerID)
 	addRoutes.DELETE("/systemcontrollers/:id", server.DeleteSystemController)
 	// Subclouds endpoints
 	addRoutes.POST("/subclouds", server.CreateSubcloud)
