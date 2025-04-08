@@ -50,7 +50,7 @@ CREATE TABLE nodes (
 
 CREATE TABLE bios_settings (
     id SERIAL PRIMARY KEY,
-    node_id INT REFERENCES nodes(id) ON DELETE CASCADE,
+    node_id INT REFERENCES nodes(id) ON DELETE CASCADE NOT NULL,
     setting_key VARCHAR(255) NOT NULL,
     setting_value VARCHAR(255) NOT NULL,
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP

@@ -119,7 +119,23 @@ func (server *Server) GetNodeById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
+type BiosAttrParams struct {
+	Id int32 `uri:"id" binding:"required"`
+}
 
+func (Server *Server) GetNodeBiosAttributes(ctx *gin.Context) {
+	var params BiosAttrParams
+	if err := ctx.ShouldBindUri(&params); err != nil {
+		ctx.JSON(http.StatusBadRequest, utils.ErrorResponse(err))
+		return
+	}
+	attrs, err := Server.store.ListBiosAttrByNodeId(ctx, params.Id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
+		return
+	}
+	ctx.JSON(http.StatusOK, attrs)
+}
 
 func (server *Server) DeleteNode(ctx *gin.Context) {
 

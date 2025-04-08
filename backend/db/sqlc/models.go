@@ -11,11 +11,11 @@ import (
 )
 
 type BiosSetting struct {
-	ID           int32         `json:"id"`
-	NodeID       sql.NullInt32 `json:"node_id"`
-	SettingKey   string        `json:"setting_key"`
-	SettingValue string        `json:"setting_value"`
-	LastUpdated  sql.NullTime  `json:"last_updated"`
+	ID           int32        `json:"id"`
+	NodeID       int32        `json:"node_id"`
+	SettingKey   string       `json:"setting_key"`
+	SettingValue string       `json:"setting_value"`
+	LastUpdated  sql.NullTime `json:"last_updated"`
 }
 
 type Node struct {

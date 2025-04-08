@@ -5,6 +5,8 @@ import (
 	"api/utils"
 	"encoding/json"
 	"fmt"
+	"log"
+
 	// "log"
 	"net/http"
 	"strconv"
@@ -58,14 +60,14 @@ func (server *Server) CreateSystemController(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, utils.ErrorResponse(err))
 		return
 	}
-	
+
 	// Serialize config to JSON
 	configJSON, err := json.Marshal(scParams.CONFIG)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
-	
+
 	args := db.CreateSystemControllerParams{
 		Name:           scParams.Name,
 		OamFloating:    scParams.OAM_FLOATING_IP,
@@ -75,34 +77,34 @@ func (server *Server) CreateSystemController(ctx *gin.Context) {
 		Status:         "deploying",
 		// is_inventoried is false by default
 	}
-	
+
 	systemController, err := server.store.CreateSystemController(ctx, args)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
-	
+
 	// Now create nodes for this system controller
 	createdNodes := []db.Node{}
 	var createNodesError error = nil
-	
+
 	// Process controller nodes
 	for i, controllerConfig := range scParams.CONFIG.Controllers {
 		nodeName := systemController.Name + "-controller-" + fmt.Sprintf("%d", i)
-		
+
 		// Use the hostname if provided, otherwise generate one
 		hostname := controllerConfig.HostName
 		if hostname == "" {
 			hostname = nodeName
 		}
-		
+
 		// Create the controller node
 		hashedPass, err := utils.CreateHashedPassword(controllerConfig.BM_PASS)
 		if err != nil {
 			createNodesError = err
 			break
 		}
-		
+
 		nodeArgs := db.CreateNodeParams{
 			Name:       nodeName,
 			Hostname:   hostname,
@@ -113,34 +115,59 @@ func (server *Server) CreateSystemController(ctx *gin.Context) {
 			ParentType: "system_controller",
 			ParentID:   systemController.ID,
 		}
-		
+
 		node, err := server.store.CreateNode(ctx, nodeArgs)
 		if err != nil {
 			createNodesError = err
 			break
 		}
-		
+
 		createdNodes = append(createdNodes, node)
+		bmInfo := utils.BM_INFO{
+			BM_IP:   controllerConfig.BM_IP,
+			BM_USER: controllerConfig.BM_USER,
+			BM_PASS: controllerConfig.BM_PASS,
+		}
+		go func(bm_info utils.BM_INFO) {
+			biosData, err := utils.GetBiosAttributes(bm_info)
+			if err != nil {
+				log.Println("Unable to fetch the Bios information", err)
+			}
+			for attr_key, attr_value := range biosData {
+				value, ok := attr_value.(string)
+				if ok {
+					args := db.CreateBiosAttrParams{
+						NodeID:       node.ID,
+						SettingKey:   attr_key,
+						SettingValue: value,
+					}
+					_, err := server.store.CreateBiosAttr(ctx, args)
+					log.Println(err)
+				}
+			}
+
+			log.Println(biosData)
+		}(bmInfo)
 	}
-	
+
 	// Process storage nodes if no error
 	if createNodesError == nil {
 		for i, storageConfig := range scParams.CONFIG.Storages {
 			nodeName := systemController.Name + "-storage-" + fmt.Sprintf("%d", i)
-			
+
 			// Use the hostname if provided, otherwise generate one
 			hostname := storageConfig.HostName
 			if hostname == "" {
 				hostname = nodeName
 			}
-			
+
 			// Create the storage node
 			hashedPass, err := utils.CreateHashedPassword(storageConfig.BM_PASS)
 			if err != nil {
 				createNodesError = err
 				break
 			}
-			
+
 			nodeArgs := db.CreateNodeParams{
 				Name:       nodeName,
 				Hostname:   hostname,
@@ -151,35 +178,35 @@ func (server *Server) CreateSystemController(ctx *gin.Context) {
 				ParentType: "system_controller",
 				ParentID:   systemController.ID,
 			}
-			
+
 			node, err := server.store.CreateNode(ctx, nodeArgs)
 			if err != nil {
 				createNodesError = err
 				break
 			}
-			
+
 			createdNodes = append(createdNodes, node)
 		}
 	}
-	
+
 	// Process worker nodes if no error
 	if createNodesError == nil {
 		for i, workerConfig := range scParams.CONFIG.Workers {
 			nodeName := systemController.Name + "-worker-" + fmt.Sprintf("%d", i)
-			
+
 			// Use the hostname if provided, otherwise generate one
 			hostname := workerConfig.HostName
 			if hostname == "" {
 				hostname = nodeName
 			}
-			
+
 			// Create the worker node
 			hashedPass, err := utils.CreateHashedPassword(workerConfig.BM_PASS)
 			if err != nil {
 				createNodesError = err
 				break
 			}
-			
+
 			nodeArgs := db.CreateNodeParams{
 				Name:       nodeName,
 				Hostname:   hostname,
@@ -190,47 +217,47 @@ func (server *Server) CreateSystemController(ctx *gin.Context) {
 				ParentType: "system_controller",
 				ParentID:   systemController.ID,
 			}
-			
+
 			node, err := server.store.CreateNode(ctx, nodeArgs)
 			if err != nil {
 				createNodesError = err
 				break
 			}
-			
+
 			createdNodes = append(createdNodes, node)
 		}
 	}
-	
+
 	// If all nodes are created successfully, update is_inventoried to true
 	if createNodesError == nil && len(createdNodes) > 0 {
 		updateArgs := db.UpdateSystemControllerInventoryParams{
 			ID:            systemController.ID,
 			IsInventoried: true,
 		}
-		
+
 		systemController, err = server.store.UpdateSystemControllerInventory(ctx, updateArgs)
 		if err != nil {
 			createNodesError = err
 		}
 	}
-	
+
 	// If there was an error creating nodes, return it
 	if createNodesError != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(createNodesError))
 		return
 	}
-	
+
 	// Create a response that includes both the system controller and nodes
 	type EnhancedSystemControllerResponse struct {
 		SystemController db.SystemController `json:"system_controller"`
 		Nodes            []db.Node           `json:"nodes"`
 	}
-	
+
 	response := EnhancedSystemControllerResponse{
 		SystemController: systemController,
 		Nodes:            createdNodes,
 	}
-	
+
 	ctx.JSON(http.StatusOK, response)
 }
 
@@ -275,7 +302,6 @@ func (server *Server) GetSystemControllerById(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, systemController)
 }
-
 
 func (server *Server) GetControllerNodesBySystemControllerID(ctx *gin.Context) {
 	idParam := ctx.Param("id")
@@ -334,13 +360,12 @@ func (server *Server) DeleteSystemController(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, utils.ErrorResponse(err))
 		return
 	}
-	
+
 	err := server.store.DeleteSystemController(ctx, params.Id)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
-	
+
 	ctx.JSON(http.StatusOK, gin.H{"message": "System controller deleted successfully"})
 }
-

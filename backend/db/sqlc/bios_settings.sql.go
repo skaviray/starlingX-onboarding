@@ -7,7 +7,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createBiosAttr = `-- name: CreateBiosAttr :one
@@ -22,9 +21,9 @@ RETURNING id, node_id, setting_key, setting_value, last_updated
 `
 
 type CreateBiosAttrParams struct {
-	NodeID       sql.NullInt32 `json:"node_id"`
-	SettingKey   string        `json:"setting_key"`
-	SettingValue string        `json:"setting_value"`
+	NodeID       int32  `json:"node_id"`
+	SettingKey   string `json:"setting_key"`
+	SettingValue string `json:"setting_value"`
 }
 
 func (q *Queries) CreateBiosAttr(ctx context.Context, arg CreateBiosAttrParams) (BiosSetting, error) {
@@ -72,6 +71,40 @@ type ListBiosAttrParams struct {
 
 func (q *Queries) ListBiosAttr(ctx context.Context, arg ListBiosAttrParams) ([]BiosSetting, error) {
 	rows, err := q.db.QueryContext(ctx, listBiosAttr, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []BiosSetting{}
+	for rows.Next() {
+		var i BiosSetting
+		if err := rows.Scan(
+			&i.ID,
+			&i.NodeID,
+			&i.SettingKey,
+			&i.SettingValue,
+			&i.LastUpdated,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listBiosAttrByNodeId = `-- name: ListBiosAttrByNodeId :many
+SELECT id, node_id, setting_key, setting_value, last_updated FROM bios_settings 
+WHERE node_id = $1
+`
+
+func (q *Queries) ListBiosAttrByNodeId(ctx context.Context, nodeID int32) ([]BiosSetting, error) {
+	rows, err := q.db.QueryContext(ctx, listBiosAttrByNodeId, nodeID)
 	if err != nil {
 		return nil, err
 	}

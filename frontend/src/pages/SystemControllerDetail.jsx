@@ -2,17 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
 import { api } from '../services/api';
 import { Spinner } from 'react-bootstrap';
-
+import {Table, Button} from 'react-bootstrap'
 function SystemControllerDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
+  const [controllers, setControllers] = useState([])
+  const [storages, setStorages] = useState([])
+  const [workers, setWorkers] = useState([])
   const [controller, setController] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchControllerDetails();
+    fetchControllers();
+    fetchStorages();
+    fetchWorkers();
   }, [id]);
 
   const fetchControllerDetails = async () => {
@@ -27,6 +33,75 @@ function SystemControllerDetail() {
       setIsLoading(false);
     }
   };
+
+  const fetchControllers = async () => {
+    try{
+      setIsLoading(true)
+      const controllers = await api.get(`/systemcontrollers/${id}/controllers`);
+      setControllers(controllers)
+    } catch (err) {
+      setError("Unable to fetch the controllers:", err);
+      console.log("Error fetching controllers: ", err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const fetchStorages = async () => {
+    try{
+      setIsLoading(true)
+      const storages = await api.get(`/systemcontrollers/${id}/storages`);
+      setStorages(storages)
+    } catch (err) {
+      setError("Unable to fetch the storages:", err);
+      console.log("Error fetching storages: ", err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+  
+  const fetchWorkers = async () => {
+    try{
+      setIsLoading(true)
+      const workers = await api.get(`/systemcontrollers/${id}/workers`);
+      setWorkers(workers)
+    } catch (err) {
+      setError("Unable to fetch the workers:", err);
+      console.log("Error fetching workers: ", err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const Node = ({nodes}) => {
+    console.log(nodes)
+    return (
+      <div className="card">
+      <div className="card-body">
+        <Table striped bordered hover>
+          <thead>
+            <th>ID</th>
+            <th>NAME</th>
+            <th>BM_IP</th>
+            <th>STATUS</th>
+            <th>Action</th>
+          </thead>
+          <tbody>
+            {nodes.map((item) => (
+            <tr>
+              <td>{item.id}</td>
+              <td>{item.name}</td>
+              <td><a href={`https://${item.bm_ip}`} className="text-blue-600 hover:underline">https://{item.bm_ip}</a></td>
+              <td>{item.status}</td>
+              <td><Button>Action</Button></td>
+            </tr>
+            ))}
+          </tbody>
+        </Table>
+      </div>
+    </div>
+    )
+  }
 
   const tabs = [
     { id: "overview", label: "Overview" },
@@ -191,30 +266,15 @@ function SystemControllerDetail() {
         )}
 
         {activeTab === "controllers" && (
-          <div className="card">
-            <div className="card-body">
-              <h5 className="card-title">Controllers</h5>
-              <p>Controller information will be displayed here.</p>
-            </div>
-          </div>
+          <Node nodes={controllers}></Node>
         )}
 
         {activeTab === "storages" && (
-          <div className="card">
-            <div className="card-body">
-              <h5 className="card-title">Storages</h5>
-              <p>Storage information will be displayed here.</p>
-            </div>
-          </div>
+          <Node nodes={storages}></Node>
         )}
 
         {activeTab === "compute" && (
-          <div className="card">
-            <div className="card-body">
-              <h5 className="card-title">Compute</h5>
-              <p>Compute information will be displayed here.</p>
-            </div>
-          </div>
+          <Node nodes={workers}></Node>
         )}
 
         {activeTab === "subclouds" && (

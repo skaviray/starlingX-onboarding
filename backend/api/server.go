@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"time"
 
-
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -67,6 +66,7 @@ func (server *Server) setupRouter() {
 	addRoutes.POST("/nodes", server.CreateNode)
 	addRoutes.GET("/nodes", server.ListNodes)
 	addRoutes.GET("/nodes/:id", server.GetNodeById)
+	addRoutes.GET("/nodes/:id/bios", server.GetNodeBiosAttributes)
 	server.router = router
 }
 

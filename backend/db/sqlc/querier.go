@@ -35,6 +35,7 @@ type Querier interface {
 	GetUser(ctx context.Context, username string) (User, error)
 	GetWorkerNodesBySystemControllerID(ctx context.Context, parentID int32) ([]Node, error)
 	ListBiosAttr(ctx context.Context, arg ListBiosAttrParams) ([]BiosSetting, error)
+	ListBiosAttrByNodeId(ctx context.Context, nodeID int32) ([]BiosSetting, error)
 	ListNodes(ctx context.Context, arg ListNodesParams) ([]Node, error)
 	ListSubclouds(ctx context.Context) ([]Subcloud, error)
 	ListSystemController(ctx context.Context) ([]SystemController, error)

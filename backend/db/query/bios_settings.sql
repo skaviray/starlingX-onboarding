@@ -18,6 +18,11 @@ ORDER BY id
 LIMIT $1
 OFFSET $2;
 
+-- name: ListBiosAttrByNodeId :many
+SELECT * FROM bios_settings 
+WHERE node_id = $1;
+
+
 -- -- name: DeleteBiosAttr :exec
 -- DELETE FROM nodes
 -- WHERE id = $1;
