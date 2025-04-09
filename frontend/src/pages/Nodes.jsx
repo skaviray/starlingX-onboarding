@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import { api } from '../services/api';
-import { Table, Spinner } from 'react-bootstrap';
+import { Table, Spinner, Button } from 'react-bootstrap';
+import {ActionsDropDown} from './Helpers'
 
 function Nodes() {
+  const nodeActions = ["PowerON","PowerOff","Reboot","Lock","Unlock","ForceLock"]
   const [showModal, setShowModal] = useState(false);
   const [newNode, setNewNode] = useState({
     name: "",
@@ -304,25 +306,10 @@ function Nodes() {
                     </span>
                   </td>
                   <td>
-                    <div className="dropdown">
-                      <button
-                        className="btn btn-secondary dropdown-toggle"
-                        type="button"
-                        id={`dropdownMenuButton${node.id}`}
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                      >
-                        Actions
-                      </button>
-                      <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${node.id}`}>
-                        <li><Link className="dropdown-item" to={`/nodes/${node.id}`}>View Details</Link></li>
-                        <li><a className="dropdown-item" href="#">Configure</a></li>
-                        <li><a className="dropdown-item" href="#">Power On</a></li>
-                        <li><a className="dropdown-item" href="#">Power Off</a></li>
-                        <li><hr className="dropdown-divider" /></li>
-                        <li><a className="dropdown-item text-danger" href="#">Delete</a></li>
-                      </ul>
+                    <div>
+                      <ActionsDropDown actions={nodeActions}>Actions</ActionsDropDown>
                     </div>
+
                   </td>
                 </tr>
               ))}

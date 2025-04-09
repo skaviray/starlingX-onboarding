@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
 import { api } from '../services/api';
 import { Spinner } from 'react-bootstrap';
-import {Table, Button} from 'react-bootstrap'
+import {Table, Button, Col, Nav,Row,Tab} from 'react-bootstrap'
+
 function SystemControllerDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -149,22 +150,31 @@ function SystemControllerDetail() {
         <h2 className="mb-0">System Controller {controller.name} Details</h2>
       </div>
 
-      <ul className="nav nav-tabs mb-4">
-        {tabs.map((tab) => (
-          <li className="nav-item" key={tab.id}>
-            <button
-              className={`nav-link ${activeTab === tab.id ? "active" : ""}`}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              {tab.label}
-            </button>
-          </li>
-        ))}
-      </ul>
-
-      <div className="tab-content">
-        {activeTab === "overview" && (
-          <div className="card">
+      <Tab.Container id="left-tabs-example" defaultActiveKey="Overview">
+      <Row>
+        <Col sm={2}>
+          <Nav variant="tabs" className="flex-column">
+            <Nav.Item>
+              <Nav.Link eventKey="Overview">Overview</Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="Subclouds">Subclouds</Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="Controllers">Controllers</Nav.Link> 
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="Storages">Storages</Nav.Link> 
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="Workers">Workers</Nav.Link> 
+            </Nav.Item>
+          </Nav>
+        </Col>
+        <Col sm={10}>
+          <Tab.Content>
+            <Tab.Pane eventKey="Overview">
+            <div className="card">
             <div className="card-body">
               <h5 className="card-title">Overview</h5>
               <div className="row">
@@ -218,74 +228,15 @@ function SystemControllerDetail() {
               </div>
             </div>
           </div>
-        )}
-
-        {activeTab === "overview" && (
-          <div className="card mt-4">
-            <div className="card-body">
-              <h5 className="card-title">Configuration</h5>
-              <div className="row">
-                <div className="col-md-12">
-                  <h6>Network Configuration</h6>
-                  <table className="table">
-                    <tbody>
-                      <tr>
-                        <th>OAM</th>
-                        <td>{controller.config.network_config.oam}</td>
-                      </tr>
-                      <tr>
-                        <th>Cluster Host</th>
-                        <td>{controller.config.network_config.cluster_host}</td>
-                      </tr>
-                      <tr>
-                        <th>Management</th>
-                        <td>{controller.config.network_config.mgmt}</td>
-                      </tr>
-                      <tr>
-                        <th>Admin</th>
-                        <td>{controller.config.network_config.admin}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <h6>NTP Servers</h6>
-                  <ul>
-                    {controller.config.ntp_Servers.map((server, index) => (
-                      <li key={index}>{server}</li>
-                    ))}
-                  </ul>
-                  <h6>DNS Servers</h6>
-                  <ul>
-                    {controller.config.dns_Servers.map((server, index) => (
-                      <li key={index}>{server}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "controllers" && (
-          <Node nodes={controllers}></Node>
-        )}
-
-        {activeTab === "storages" && (
-          <Node nodes={storages}></Node>
-        )}
-
-        {activeTab === "compute" && (
-          <Node nodes={workers}></Node>
-        )}
-
-        {activeTab === "subclouds" && (
-          <div className="card">
-            <div className="card-body">
-              <h5 className="card-title">Subclouds</h5>
-              <p>Subcloud information will be displayed here.</p>
-            </div>
-          </div>
-        )}
-      </div>
+            </Tab.Pane>
+            <Tab.Pane eventKey="Subclouds">Second tab content</Tab.Pane>
+            <Tab.Pane eventKey="Controllers"><Node nodes={controllers}></Node></Tab.Pane>
+            <Tab.Pane eventKey="Storages"><Node nodes={storages}></Node></Tab.Pane>
+            <Tab.Pane eventKey="Workers"><Node nodes={workers}></Node></Tab.Pane>
+          </Tab.Content>
+        </Col>
+      </Row>
+    </Tab.Container>
     </div>
   );
 }

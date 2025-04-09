@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
 import { api } from '../services/api';
-import { Button, Spinner } from 'react-bootstrap';
+import { Button, Spinner, Col,Nav,Row,Tab } from 'react-bootstrap';
+
 
 
 const ITEMS_PER_PAGE = 10;
@@ -20,88 +21,17 @@ function NodeDetail() {
     fetchNodeBiosInfo();
   }, [id]);
 
-  // const BiosTableWithPagination = ({nodeBios, activeTab}) => {
-
-  //   const [currentPage, setCurrentPage] = useState(1);
-  //   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  //   const endIndex = startIndex + ITEMS_PER_PAGE;
-  //   const paginatedBios = nodeBios.slice(startIndex, endIndex);
-  //   const totalPages = Math.ceil(nodeBios.length / ITEMS_PER_PAGE);
-  //   const goToNextPage = () => {
-  //     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-  //   };
-
-  //   const goToPreviousPage = () => {
-  //     if (currentPage > 1) setCurrentPage(currentPage - 1);
-  //   };
-  //   return (
-  //     <>
-  //       {activeTab === "bios" && (
-  //         <div className="card">
-  //           <div className="card-body">
-  //           <input
-  //             type="text"
-  //             placeholder="Filter by attribute key..."
-  //             // value={filterTerm}
-  //             // onChange={(e) => setFilterTerm(e.target.value)}
-  //             className="input input-bordered w-full max-w-xs"
-  //           />
-  //             <table className="table">
-  //               <thead>
-  //                 <tr>
-  //                   <th>id</th>
-  //                   <th>attribute</th>
-  //                   <th>value</th>
-  //                 </tr>
-  //               </thead>
-  //               <tbody>
-  //                 {paginatedBios.map((item) => (
-  //                   <tr key={item.id}>
-  //                     <td>{item.id}</td>
-  //                     <td>{item.setting_key}</td>
-  //                     <td>{item.setting_value}</td>
-  //                   </tr>
-  //                 ))}
-  //               </tbody>
-  //             </table>
-  
-  //             {/* Pagination Controls */}
-  //             <div className="flex items-center justify-between w-full px-4 py-2">
-  //               <button
-  //                 onClick={goToPreviousPage}
-  //                 disabled={currentPage === 1}
-  //                 className={`px-4 py-2 rounded ${
-  //                   currentPage === 1 ? "bg-gray-300" : "bg-blue-500 text-white"
-  //                 }`}
-  //               >
-  //                 &lt;
-  //               </button>
-  
-  //               <span className="text-center flex-1 text-lg">
-  //                 Page {currentPage} of {totalPages}
-  //               </span>
-  
-  //               <button
-  //                 onClick={goToNextPage}
-  //                 disabled={currentPage === totalPages}
-  //                 className={`px-4 py-2 rounded ${
-  //                   currentPage === totalPages
-  //                     // ? "bg-gray-300"
-  //                     // : "bg-blue-500 text-white"
-  //                 }`}
-  //               >&gt;</button>
-  //             </div>
-  //           </div>
-  //         </div>
-  //       )}
-  //     </>
-  //   );
-  // };
-
-  const BiosTableWithPagination = ({ nodeBios, activeTab }) => {
+  const BiosTableWithPagination = ({ nodeBios }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [filterTerm, setFilterTerm] = useState("");
-  
+
+    useEffect(() => {
+      setCurrentPage(1);
+    }, [filterTerm]);
+    
+    if (!nodeBios || !Array.isArray(nodeBios)) {
+      return <div className="text-muted">No BIOS data available.</div>;
+    }
     // Filter bios attributes based on the key
     const filteredBios = nodeBios.filter((item) =>
       item.setting_key.toLowerCase().includes(filterTerm.toLowerCase())
@@ -113,9 +43,7 @@ function NodeDetail() {
     const paginatedBios = filteredBios.slice(startIndex, endIndex);
   
     // Reset to page 1 if filter term changes
-    useEffect(() => {
-      setCurrentPage(1);
-    }, [filterTerm]);
+
   
     const goToNextPage = () => {
       if (currentPage < totalPages) setCurrentPage(currentPage + 1);
@@ -126,8 +54,6 @@ function NodeDetail() {
     };
   
     return (
-      <>
-        {activeTab === "bios" && (
           <div className="card">
             <div className="card-body space-y-4">
               {/* 🔍 Filter Input */}
@@ -190,8 +116,6 @@ function NodeDetail() {
               </div>
             </div>
           </div>
-        )}
-      </>
     );
   };
 
@@ -268,22 +192,25 @@ function NodeDetail() {
         <h2 className="mb-0">Node {node.name} Details</h2>
       </div>
 
-      <ul className="nav nav-tabs mb-4">
-        {tabs.map((tab) => (
-          <li className="nav-item" key={tab.id}>
-            <button
-              className={`nav-link ${activeTab === tab.id ? "active" : ""}`}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              {tab.label}
-            </button>
-          </li>
-        ))}
-      </ul>
-
-      <div className="tab-content">
-        {activeTab === "overview" && (
-          <div className="card">
+      <Tab.Container id="left-tabs-example" defaultActiveKey="Overview">
+      <Row>
+        <Col sm={2}>
+          <Nav variant="pills" className="flex-column">
+            <Nav.Item>
+              <Nav.Link eventKey="Overview">Overview</Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="Bios">Bios</Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="Hardware">Hardware</Nav.Link>
+            </Nav.Item>
+          </Nav>
+        </Col>
+        <Col sm={10}>
+          <Tab.Content>
+            <Tab.Pane eventKey="Overview">
+            <div className="card">
             <div className="card-body">
               <h5 className="card-title">Overview</h5>
               <div className="row">
@@ -368,56 +295,15 @@ function NodeDetail() {
               </div>
             </div>
           </div>
-        )}
-
-        {/* {activeTab === "bios" && (
-          <div className="card">
-            <div className="card-body">
-              <table className='table'>
-                <thead>
-                  <tr>
-                    <th>id</th>
-                    <th>attribute</th>
-                    <th>value</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {nodeBios.map((item) => (
-                    
-                      <tr>
-                        <td>{item.id}</td>
-                        <td>{item.setting_key}</td>
-                        <td>{item.setting_value}</td>
-                      </tr>
-                    
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )} */}
-        {activeTab === "bios" && (
-          <BiosTableWithPagination nodeBios={nodeBios} activeTab ={activeTab} />
-        )}
-
-        {activeTab === "configuration" && (
-          <div className="card">
-            <div className="card-body">
-              <h5 className="card-title">Configuration</h5>
-              <p>Configuration information will be displayed here.</p>
-            </div>
-          </div>
-        )}
-
-        {activeTab === "logs" && (
-          <div className="card">
-            <div className="card-body">
-              <h5 className="card-title">Logs</h5>
-              <p>Log information will be displayed here.</p>
-            </div>
-          </div>
-        )}
-      </div>
+            </Tab.Pane>
+            <Tab.Pane eventKey="Bios">
+            <BiosTableWithPagination nodeBios={nodeBios}/>
+            </Tab.Pane>
+            <Tab.Pane eventKey="Hardware">Hardware Details</Tab.Pane>
+          </Tab.Content>
+        </Col>
+      </Row>
+    </Tab.Container>
     </div>
   );
 }

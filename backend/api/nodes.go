@@ -9,6 +9,57 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Ethernet struct {
+	Name             string            `json:"name"`
+	Class            string            `json:"class"`
+	Port             map[string]string `json:"port"`
+	DataNetworks     []string          `json:"dataNetworks"`
+	Lower            string            `json:"lower"`
+	Mtu              int64             `json:"mtu"`
+	PlatformNetworks []string          `json:"platformNetworks"`
+	PtpInterfaces    []string          `json:"ptpInterfaces"`
+	PtpRole          string            `json:"ptpRole"`
+	VfCount          int32             `json:"vfCount"`
+	VfDriver         string            `json:"vfDriver"`
+}
+
+type Vlan struct {
+	Name   string `json:"name"`
+	VlanId string `json:"vlan_id"`
+}
+
+type Bond struct {
+	Name string `json:"name"`
+}
+
+type Memory struct {
+	Name string `json:"name"`
+}
+
+type Processors struct {
+	Name string `json:"name"`
+}
+
+type PtpInstance struct {
+	Name string `json:"name"`
+}
+
+type Storage struct {
+	Name string `json:"name"`
+}
+
+type Osd struct {
+	Name     string `json:"name"`
+	Cluster  string `json:"cluster"`
+	Function string `json:"function"`
+	Path     string `json:"path"`
+}
+
+type DataNetwork struct {
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
 type CreateNodeReq struct {
 	Name       string `json:"name"`
 	HostName   string `json:"host_name"`
@@ -18,6 +69,19 @@ type CreateNodeReq struct {
 	BmIp       string `json:"bm_ip" binding:"required,ipv4"`
 	BmUser     string `json:"bm_user" binding:"required"`
 	BmPass     string `json:"bm_pass" binding:"required"`
+	//Network Information
+	Ethernets    []Ethernet    `json:"ethernets"`
+	Vlans        []Vlan        `json:"vlans"`
+	Bonds        []Bond        `json:"bonds"`
+	DataNetworks []DataNetwork `json:"DataNetworks"`
+	//k8s Labels
+	Labels []string `json:"labels"`
+	//Memory Information
+	Memory     []Memory     `json:"memory"`
+	Processors []Processors `json:"processors"`
+	//Sorage Information
+	Storages []Storage `json:"storage"`
+	Osds     []Osd     `json:"osds"`
 }
 
 func (server *Server) CreateNode(ctx *gin.Context) {

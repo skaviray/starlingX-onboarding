@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import { api } from '../services/api';
 import { Table, Spinner, Form, Row, Col, Alert, Tabs, Tab } from 'react-bootstrap';
+import {ActionsDropDown} from './Helpers'
 
 function SystemController() {
+  const systemControllerActions = ["Bootstrap","Configure","Swact"]
   const [showModal, setShowModal] = useState(false);
   const [newController, setNewController] = useState({
     name: "",
@@ -1101,7 +1103,8 @@ function SystemController() {
                     </span>
                   </td>
                   <td>
-                    <div className="dropdown">
+                    <ActionsDropDown actions={systemControllerActions}></ActionsDropDown>
+                    {/* <div className="dropdown">
                       <button
                         className="btn btn-secondary dropdown-toggle"
                         type="button"
@@ -1119,7 +1122,7 @@ function SystemController() {
                         <li><hr className="dropdown-divider" /></li>
                         <li><a className="dropdown-item text-danger" href="#">Delete</a></li>
                       </ul>
-                    </div>
+                    </div> */}
                   </td>
                 </tr>
               ))}
