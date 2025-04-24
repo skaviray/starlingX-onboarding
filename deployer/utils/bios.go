@@ -19,7 +19,7 @@ func redfishGet(client *http.Client, info BM_INFO, path string) ([]byte, error) 
 	url := fmt.Sprintf("https://%s%s", info.BM_IP, path)
 	req, _ := http.NewRequest("GET", url, nil)
 	req.SetBasicAuth(info.BM_USER, info.BM_PASS)
-	req.Header.Set("Accept", "application/json")
+	req.Header.Set("content-type", "application/json")
 	res, err := client.Do(req)
 	if err != nil {
 		log.Println(err)

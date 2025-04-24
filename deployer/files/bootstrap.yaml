@@ -1,0 +1,99 @@
+system_mode: duplex
+timezone: Europe/London
+distributed_cloud_role: subcloud
+location: 'EX82NR'
+contact: 'masoud.fatollahy@windriver.com'
+name: 'xr8000-conf2-one' # agreed as -orancaas
+description: 'xr8000-conf2-one'
+https_enabled: False
+dns_servers: ['128.224.212.241']
+
+# OAM network
+# VLAN#: 211
+# Interface: enp81s0f0
+external_oam_subnet: 128.224.211.0/24
+external_oam_gateway_address: 128.224.211.1
+external_oam_floating_address: 128.224.211.124
+external_oam_node_0_address: 128.224.211.125
+external_oam_node_1_address: 128.224.211.126
+
+
+# Management network
+# VLAN#: 118
+# Interface: enp81s0f0
+# management_multicast_subnet:
+# mangement_multicast_start_address:
+# management_multicast_end_address:
+management_subnet: 192.168.118.0/24
+management_start_address: 192.168.118.2
+management_end_address: 192.168.118.7
+management_gateway_address: 192.168.118.1
+
+
+# Cluster host network
+# VLAN#: 318
+# Interface: enp81s0f0
+cluster_host_subnet: 192.168.15.0/24
+cluster_host_start_address: 192.168.15.2
+cluster_host_end_address: 192.168.15.5
+
+management_multicast_subnet: 231.1.18.0/28
+
+systemcontroller_gateway_address: 192.168.100.1
+
+# ==================
+# PASSWORD INITIAL PROPERTIES
+# ==================
+# this will be used for automation
+password_change: true
+password_change_responses:
+  yes/no: 'yes'
+  sysadmin*: 'sysadmin'
+  \(current\) UNIX password: 'sysadmin'
+  (?i)New password: 'Li69nux*'
+  (?i)Retype new password: 'Li69nux*'
+docker_registries:
+  docker.elastic.co:
+      url: registry.central:9001/docker.elastic.co
+  docker.io:
+      url: registry.central:9001/docker.io
+  gcr.io:
+      url: registry.central:9001/gcr.io
+  ghcr.io:
+      url: registry.central:9001/ghcr.io
+  icr.io:
+      url: registry.central:9001/icr.io
+  k8s.gcr.io:
+      url: registry.central:9001/k8s.gcr.io
+  quay.io:
+      url: registry.central:9001/quay.io
+  registry.k8s.io:
+      url: registry.central:9001/registry.k8s.io
+  defaults:
+    type: docker
+    username: 'sysinv'
+    password: 'SpdPO73XKgkHfrW_'
+
+admin_password: 'Caas-r640-wra*'
+ansible_become_pass: 'Li69nux*'
+additional_local_registry_images:
+   - k8s.gcr.io/metrics-server/metrics-server:v0.6.1
+   - docker.io/starlingx/stx-metrics-server-sample-app:stx.7.0-v1.0.0
+   - docker.io/starlingx/locationservice-base:stx.8.0-v2.0.0
+   - docker.io/starlingx/notificationservice-base-v2:stx.9.0-v2.1.2
+   - docker.io/rabbitmq:3.8.11-management
+   - docker.io/starlingx/notificationservice-base:stx.9.0-v2.1.2
+   - docker.io/hashicorp/vault-k8s:0.14.2
+   - docker.io/hashicorp/vault-csi-provider:0.4.0
+   - docker.io/starlingx/stx-vault-manager:stx.5.0-v1.18.3
+   - docker.io/hashicorp/vault:1.9.2
+   - quay.io/cephcsi/cephcsi:v3.9.0
+   - registry.k8s.io/sig-storage/csi-attacher:v4.3.0
+   - registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.8.0
+   - registry.k8s.io/sig-storage/csi-provisioner:v3.5.0
+   - registry.k8s.io/sig-storage/csi-resizer:v1.8.0
+   - registry.k8s.io/sig-storage/csi-snapshotter:v6.2.2
+   - docker.io/openstackhelm/ceph-config-helper:ubuntu_focal_17.2.6-1-20230508
+   - docker.io/wind-river/cloud-platform-deployment-manager:WRCP_22.12-wrs.13
+   - k8s.gcr.io/kube-proxy:v1.21.8-wrs.1
+   - gcr.io/kubebuilder/kube-rbac-proxy:v0.13.1

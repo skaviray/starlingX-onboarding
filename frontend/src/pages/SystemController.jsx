@@ -1104,25 +1104,6 @@ function SystemController() {
                   </td>
                   <td>
                     <ActionsDropDown actions={systemControllerActions}></ActionsDropDown>
-                    {/* <div className="dropdown">
-                      <button
-                        className="btn btn-secondary dropdown-toggle"
-                        type="button"
-                        id={`dropdownMenuButton${controller.id}`}
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                      >
-                        Actions
-                      </button>
-                      <ul className="dropdown-menu" aria-labelledby={`dropdownMenuButton${controller.id}`}>
-                        <li><Link className="dropdown-item" to={`/systemcontroller/${controller.id}`}>View Details</Link></li>
-                        <li><a className="dropdown-item" href="#">Configure</a></li>
-                        <li><a className="dropdown-item" href="#">Add Node</a></li>
-                        <li><a className="dropdown-item" href="#">c0-bootstrap</a></li>
-                        <li><hr className="dropdown-divider" /></li>
-                        <li><a className="dropdown-item text-danger" href="#">Delete</a></li>
-                      </ul>
-                    </div> */}
                   </td>
                 </tr>
               ))}

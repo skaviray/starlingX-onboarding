@@ -1,0 +1,21 @@
+software_version: 22.12
+bootstrap_interface: enp112s0f0
+
+bootstrap_address: 128.224.211.124
+bootstrap_address_prefix: 24
+bootstrap_gateway: 128.224.211.1
+
+bmc_address: 128.224.210.76
+bmc_username: root
+nexthop_gateway: 128.224.211.1
+
+install_type: 3
+
+wait_for_timeout: 3600
+
+no_check_certificate: True
+
+bootstrap_vlan: 211
+rootfs_device: "/dev/disk/by-path/pci-0000:44:00.0-nvme-1"
+boot_device: "/dev/disk/by-path/pci-0000:44:00.0-nvme-1"
+persistent_size: 30000

@@ -1,0 +1,1075 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: deployment
+spec: {}
+---
+apiVersion: starlingx.windriver.com/v1
+kind: System
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: xr8000-conf2-one
+  namespace: deployment
+spec:
+  contact: masoud.fatollahy@windriver.com
+  dnsServers: ['128.224.212.241']
+  license:
+    secret: system-license
+  location: London
+  ptp:
+    mechanism: e2e
+    mode: hardware
+    transport: l2
+  serviceParameters:
+  - paramname: heartbeat_failure_threshold
+    paramvalue: "20"
+    section: maintenance
+    service: platform
+  - paramname: heartbeat_failure_action
+    paramvalue: alarm
+    section: maintenance
+    service: platform
+  - paramname: heartbeat_degrade_threshold
+    paramvalue: "10"
+    section: maintenance
+    service: platform
+  - paramname: process_size_max
+    paramvalue: 5G
+    section: coredump
+    service: platform
+  - paramname: external_size_max
+    paramvalue: 5G
+    section: coredump
+    service: platform
+  storage:
+    backends:
+    - name: ceph-store
+      network: mgmt
+      replicationFactor: 2
+      type: ceph
+    drbd:
+      linkUtilization: 40
+    filesystems:
+    - name: platform
+      size: 10
+    - name: database
+      size: 10
+    - name: extension
+      size: 1
+    - name: etcd
+      size: 5
+    - name: docker-distribution
+      size: 16
+  vswitchType: none
+---
+apiVersion: v1
+data:
+  OS_PASSWORD: Q2Fhcy1yNjQwLXdyYSo=
+  OS_USERNAME: YWRtaW4=
+kind: Secret
+metadata:
+  name: system-endpoint
+  namespace: deployment
+stringData:
+  OS_AUTH_URL: http://192.168.118.2:5000/v3
+  OS_INTERFACE: internal
+  OS_PROJECT_DOMAIN_NAME: Default
+  OS_PROJECT_NAME: admin
+  OS_REGION_NAME: xr8000-conf2-one
+type: Opaque
+---
+apiVersion: v1
+data:
+  content: IyBXaW5kIFJpdmVyIFByb2R1Y3QgQWN0aXZhdGlvbiBGaWxlIChpbnN0YWxsLnR4dCkKIyBJc3N1ZWQgZm9yIGhvc3Q6IDxJbnRlcm5hbFVzZT4gPEludGVybmFsVXNlPiA8QW55PgojIExpY2Vuc2UgbnVtYmVyKHMpOiBXUiBJbnRlcm5hbAojIElzc3VlZCBvbjogMjItanVs
+LTIwMjIgMDk6NTA6NTAKIwojIE5vdGU6IHRoaXMgbGljZW5zZSBpcyBnZW5lcmF0ZWQgY3VtdWxhdGl2ZWx5IGZvciBhbGwKIyBXaW5kIFJpdmVyIHNvZnR3YXJlIG1hbmFnZWQgYnkgdGhpcyBob3N0LgoKIyAxLiBGbGV4TE0gbGljZW5zZSBmaWxlOgojIEJlZ2luOiBTZXJ2ZXIgbGljZW5
+zZSAgLS0tLS0tLS0tLS0tLS0tLS0tLS0tCiMgU2VyaWFsIE51bWJlcjogNjg0ODcyLUludGVybmFsVXNlLUc0V0RDOUNQRUsKClBBQ0tBR0UgV1JDUF9DT05UQUlORVJfUEtHIHdyc2QgMjIgODUwREJFMDBCQUJFIFwKICAgICAgICBDT01QT05FTlRTPVdSQ1BfQ09OVEFJTkVSOjIyLjEyIE
+9QVElPTlM9U1VJVEUgXAogICAgICAgIFNJR049MTZCODI2ODY5MEQ4CklOQ1JFTUVOVCBXUkNQX0NPTlRBSU5FUl9QS0cgd3JzZCAyMiAzMS1kZWMtMjAyNyB1bmNvdW50ZWQgXAogICAgICAgIDM1NDYxRjU0OTEwMyBcCiAgICAgICAgVkVORE9SX1NUUklORz08bG4+SW50ZXJuYWxVc2U8L
+2xuPjxwcz4yMjEzLTQzPC9wcz4gSE9TVElEPUFOWSBcCiAgICAgICAgSVNTVUVEPTIyLWp1bC0yMDIyIFNOPXNlcmlhbC1JbnRlcm5hbFVzZS1MVjJJV0FVTEVCIFwKICAgICAgICBTVEFSVD0yMi1qdWwtMjAyMiBTSUdOPTM4Mzg3MDY0NTBDOA==
+kind: Secret
+metadata:
+  name: system-license
+  namespace: deployment
+type: Opaque
+---
+apiVersion: v1
+data:
+  password: S2lzdGFBZG1pbg==
+  username: cm9vdA==
+kind: Secret
+metadata:
+  name: controller-0-bmc-secret
+  namespace: deployment
+type: kubernetes.io/basic-auth
+---
+apiVersion: v1
+data:
+  password: S2lzdGFBZG1pbg==
+  username: cm9vdA==
+kind: Secret
+metadata:
+  name: controller-1-bmc-secret
+  namespace: deployment
+type: kubernetes.io/basic-auth
+---
+apiVersion: starlingx.windriver.com/v1
+kind: Host
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: controller-0
+  namespace: deployment
+spec:
+  match:
+    bootMAC: 50:7c:6f:53:e3:64
+  overrides:
+    boardManagement:
+      address: 128.224.210.76
+    interfaces:
+      ethernet:
+      - class: none
+        dataNetworks: []
+        mtu: 1500
+        name: lo
+        platformNetworks: []
+        port:
+          name: lo
+        ptpInterfaces: []
+        ptpRole: none
+    provisioningMode: dynamic
+  profile: controller-0-profile
+---
+apiVersion: starlingx.windriver.com/v1
+kind: Host
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: controller-1
+  namespace: deployment
+spec:
+  overrides:
+    boardManagement:
+      address: 128.224.210.77
+    bootMAC: 50:7c:6f:53:e3:1c
+  profile: controller-1-profile
+---
+apiVersion: starlingx.windriver.com/v1
+kind: HostProfile
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: controller-0-profile
+  namespace: deployment
+spec:
+  administrativeState: unlocked
+  boardManagement:
+    credentials:
+      password:
+        secret: controller-0-bmc-secret
+    type: dynamic
+  bootDevice: /dev/disk/by-path/pci-0000:44:00.0-nvme-1
+  clockSynchronization: ptp
+  console: tty0
+  installOutput: graphical
+  interfaces:
+    ethernet:
+    - class: pci-sriov
+      dataNetworks: []
+      mtu: 9000
+      name: common0
+      platformNetworks: []
+      port: {name: enp112s0f0}
+      ptpInterfaces: [clint1, tsint1]
+      ptpRole: none
+      vfCount: 22
+      vfDriver: netdevice
+    - class: pci-sriov
+      dataNetworks: [fh0]
+      mtu: 9000
+      name: fh0
+      platformNetworks: []
+      port: {name: enp112s0f1}
+      ptpInterfaces: [ptp-iface1]
+      ptpRole: none
+      vfCount: 8
+      vfDriver: vfio
+    - class: pci-sriov
+      dataNetworks: [fh1]
+      mtu: 9000
+      name: fh1
+      platformNetworks: []
+      port: {name: enp112s0f2}
+      ptpInterfaces: [ptp-iface1]
+      ptpRole: none
+      vfCount: 8
+      vfDriver: vfio
+    - class: pci-sriov
+      dataNetworks: [fh2]
+      mtu: 9000
+      name: fh2
+      platformNetworks: []
+      port: {name: enp112s0f3}
+      ptpInterfaces: [ptp-iface1]
+      ptpRole: none
+      vfCount: 8
+      vfDriver: vfio
+    - class: pci-sriov
+      dataNetworks: [fh3]
+      mtu: 9000
+      name: fh3
+      platformNetworks: []
+      port: {name: enp202s0f1}
+      ptpInterfaces: [ptp-iface2]
+      ptpRole: none
+      vfCount: 8
+      vfDriver: vfio
+    - class: pci-sriov
+      dataNetworks: [fh4]
+      mtu: 9000
+      name: fh4
+      platformNetworks: []
+      port: {name: enp202s0f2}
+      ptpInterfaces: [ptp-iface2]
+      ptpRole: none
+      vfCount: 8
+      vfDriver: vfio
+    - class: pci-sriov
+      dataNetworks: [fh5]
+      mtu: 9000
+      name: fh5
+      platformNetworks: []
+      port: {name: enp202s0f3}
+      ptpInterfaces: [ptp-iface2]
+      ptpRole: none
+      vfCount: 8
+      vfDriver: vfio
+    - class: pci-sriov
+      dataNetworks: [ca]
+      mtu: 9000
+      name: ca
+      platformNetworks: []
+      port: {name: enp202s0f0}
+      ptpInterfaces: [clint2, tsint1]
+      ptpRole: none
+      vfCount: 2
+      vfDriver: vfio
+    - class: platform
+      dataNetworks: []
+      lower: common0
+      name: pxeboot0
+      platformNetworks: [pxeboot]
+      port: {name: dummy}
+      ptpInterfaces: []
+      ptpRole: none
+    vf:
+    - class: pci-sriov
+      dataNetworks: [f1u]
+      lower: common0
+      mtu: 1956
+      name: f1u
+      platformNetworks: []
+      ptpInterfaces: []
+      ptpRole: none
+      vfCount: 8
+      vfDriver: vfio
+    - class: pci-sriov
+      dataNetworks: [f1cc]
+      lower: common0
+      mtu: 1956
+      name: f1cc
+      platformNetworks: []
+      ptpInterfaces: []
+      ptpRole: none
+      vfCount: 4
+      vfDriver: netdevice
+    - class: pci-sriov
+      dataNetworks: [f1cu]
+      lower: common0
+      mtu: 1956
+      name: f1cu
+      platformNetworks: []
+      ptpInterfaces: []
+      ptpRole: none
+      vfCount: 4
+      vfDriver: netdevice
+    - class: pci-sriov
+      dataNetworks: [f1c]
+      lower: common0
+      mtu: 1956
+      name: f1c
+      platformNetworks: []
+      ptpInterfaces: []
+      ptpRole: none
+      vfCount: 4
+      vfDriver: netdevice
+    - class: pci-sriov
+      dataNetworks: [fh0m]
+      lower: fh0
+      mtu: 9000
+      name: fh0m
+      platformNetworks: []
+      ptpInterfaces: []
+      ptpRole: none
+      vfCount: 4
+      vfDriver: netdevice
+    - class: pci-sriov
+      dataNetworks: [fh1m]
+      lower: fh1
+      mtu: 9000
+      name: fh1m
+      platformNetworks: []
+      ptpInterfaces: []
+      ptpRole: none
+      vfCount: 4
+      vfDriver: netdevice
+    - class: pci-sriov
+      dataNetworks: [fh2m]
+      lower: fh2
+      mtu: 9000
+      name: fh2m
+      platformNetworks: []
+      ptpInterfaces: []
+      ptpRole: none
+      vfCount: 4
+      vfDriver: netdevice
+    - class: pci-sriov
+      dataNetworks: [fh3m]
+      lower: fh3
+      mtu: 9000
+      name: fh3m
+      platformNetworks: []
+      ptpInterfaces: []
+      ptpRole: none
+      vfCount: 4
+      vfDriver: netdevice
+    - class: pci-sriov
+      dataNetworks: [fh4m]
+      lower: fh4
+      mtu: 9000
+      name: fh4m
+      platformNetworks: []
+      ptpInterfaces: []
+      ptpRole: none
+      vfCount: 4
+      vfDriver: netdevice
+    - class: pci-sriov
+      dataNetworks: [fh5m]
+      lower: fh5
+      mtu: 9000
+      name: fh5m
+      platformNetworks: []
+      ptpInterfaces: []
+      ptpRole: none
+      vfCount: 4
+      vfDriver: netdevice
+    vlan:
+    - class: platform
+      dataNetworks: []
+      lower: common0
+      name: mgmt0
+      platformNetworks:
+      - mgmt
+      ptpInterfaces: []
+      ptpRole: none
+      vid: 118
+    - class: platform
+      dataNetworks: []
+      lower: common0
+      name: cluster0
+      platformNetworks:
+      - cluster-host
+      ptpInterfaces: []
+      ptpRole: none
+      vid: 318
+    - class: platform
+      dataNetworks: []
+      lower: common0
+      name: oam0
+      platformNetworks:
+      - oam
+      ptpInterfaces: []
+      ptpRole: none
+      vid: 211
+  labels:
+    kube-cpu-mgr-policy: "static"
+    ptp-notification: "true"
+    ptp-registration: "true"
+    sriovdp: "enabled"
+  memory:
+  - functions:
+    - function: platform
+      pageCount: 4096000
+      pageSize: 4KB
+    - function: vm
+      pageCount: 64
+      pageSize: 1GB
+    node: 0
+  personality: controller
+  powerOn: true
+  processors:
+  - functions:
+    - count: 2
+      function: platform
+    - count: 23
+      function: application-isolated
+    node: 0
+  provisioningMode: static
+  ptpInstances:
+  - cl1
+  - phc-inst1
+  - ptp-inst1
+  - ptp-inst2
+  - ts1
+  rootDevice: /dev/disk/by-path/pci-0000:44:00.0-nvme-1
+  routes:
+  - gateway: 192.168.118.1
+    interface: mgmt0
+    metric: 1
+    prefix: 24
+    subnet: 192.168.100.0
+  storage:
+    filesystems:
+    - name: scratch
+      size: 100
+    - name: backup
+      size: 100
+    - name: docker
+      size: 200
+    - name: kubelet
+      size: 100
+    osds:
+    - cluster: ceph_cluster
+      function: osd
+      path: /dev/disk/by-path/pci-0000:45:00.0-nvme-1
+  subfunctions:
+  - controller
+  - worker
+---
+apiVersion: starlingx.windriver.com/v1
+kind: HostProfile
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: controller-1-profile
+  namespace: deployment
+spec:
+  administrativeState: unlocked
+  boardManagement:
+    credentials:
+      password:
+        secret: controller-1-bmc-secret
+    type: dynamic
+  bootDevice: /dev/disk/by-path/pci-0000:44:00.0-nvme-1
+  clockSynchronization: ptp
+  console: tty0
+  installOutput: graphical
+  interfaces:
+    ethernet:
+    - class: pci-sriov
+      dataNetworks: []
+      mtu: 9000
+      name: common0
+      platformNetworks: []
+      port: {name: enp112s0f0}
+      ptpInterfaces: [clint1, tsint1]
+      ptpRole: none
+      vfCount: 22
+      vfDriver: netdevice
+    - class: pci-sriov
+      dataNetworks: [fh0]
+      mtu: 9000
+      name: fh0
+      platformNetworks: []
+      port: {name: enp112s0f1}
+      ptpInterfaces: [ptp-iface1]
+      ptpRole: none
+      vfCount: 8
+      vfDriver: vfio
+    - class: pci-sriov
+      dataNetworks: [fh1]
+      mtu: 9000
+      name: fh1
+      platformNetworks: []
+      port: {name: enp112s0f2}
+      ptpInterfaces: [ptp-iface1]
+      ptpRole: none
+      vfCount: 8
+      vfDriver: vfio
+    - class: pci-sriov
+      dataNetworks: [fh2]
+      mtu: 9000
+      name: fh2
+      platformNetworks: []
+      port: {name: enp112s0f3}
+      ptpInterfaces: [ptp-iface1]
+      ptpRole: none
+      vfCount: 8
+      vfDriver: vfio
+    - class: pci-sriov
+      dataNetworks: [fh3]
+      mtu: 9000
+      name: fh3
+      platformNetworks: []
+      port: {name: enp202s0f1}
+      ptpInterfaces: [ptp-iface2]
+      ptpRole: none
+      vfCount: 8
+      vfDriver: vfio
+    - class: pci-sriov
+      dataNetworks: [fh4]
+      mtu: 9000
+      name: fh4
+      platformNetworks: []
+      port: {name: enp202s0f2}
+      ptpInterfaces: [ptp-iface2]
+      ptpRole: none
+      vfCount: 8
+      vfDriver: vfio
+    - class: pci-sriov
+      dataNetworks: [fh5]
+      mtu: 9000
+      name: fh5
+      platformNetworks: []
+      port: {name: enp202s0f3}
+      ptpInterfaces: [ptp-iface2]
+      ptpRole: none
+      vfCount: 8
+      vfDriver: vfio
+    - class: pci-sriov
+      dataNetworks: [ca]
+      mtu: 9000
+      name: ca
+      platformNetworks: []
+      port: {name: enp202s0f0}
+      ptpInterfaces: [clint2, tsint1]
+      ptpRole: none
+      vfCount: 2
+      vfDriver: vfio
+    - class: platform
+      dataNetworks: []
+      lower: common0
+      name: pxeboot0
+      platformNetworks: [pxeboot]
+      port: {name: dummy}
+      ptpInterfaces: []
+      ptpRole: none
+    vf:
+    - class: pci-sriov
+      dataNetworks: [f1u]
+      lower: common0
+      mtu: 1956
+      name: f1u
+      platformNetworks: []
+      ptpInterfaces: []
+      ptpRole: none
+      vfCount: 8
+      vfDriver: vfio
+    - class: pci-sriov
+      dataNetworks: [f1cc]
+      lower: common0
+      mtu: 1956
+      name: f1cc
+      platformNetworks: []
+      ptpInterfaces: []
+      ptpRole: none
+      vfCount: 4
+      vfDriver: netdevice
+    - class: pci-sriov
+      dataNetworks: [f1cu]
+      lower: common0
+      mtu: 1956
+      name: f1cu
+      platformNetworks: []
+      ptpInterfaces: []
+      ptpRole: none
+      vfCount: 4
+      vfDriver: netdevice
+    - class: pci-sriov
+      dataNetworks: [f1c]
+      lower: common0
+      mtu: 1956
+      name: f1c
+      platformNetworks: []
+      ptpInterfaces: []
+      ptpRole: none
+      vfCount: 4
+      vfDriver: netdevice
+    - class: pci-sriov
+      dataNetworks: [fh0m]
+      lower: fh0
+      mtu: 9000
+      name: fh0m
+      platformNetworks: []
+      ptpInterfaces: []
+      ptpRole: none
+      vfCount: 4
+      vfDriver: netdevice
+    - class: pci-sriov
+      dataNetworks: [fh1m]
+      lower: fh1
+      mtu: 9000
+      name: fh1m
+      platformNetworks: []
+      ptpInterfaces: []
+      ptpRole: none
+      vfCount: 4
+      vfDriver: netdevice
+    - class: pci-sriov
+      dataNetworks: [fh2m]
+      lower: fh2
+      mtu: 9000
+      name: fh2m
+      platformNetworks: []
+      ptpInterfaces: []
+      ptpRole: none
+      vfCount: 4
+      vfDriver: netdevice
+    - class: pci-sriov
+      dataNetworks: [fh3m]
+      lower: fh3
+      mtu: 9000
+      name: fh3m
+      platformNetworks: []
+      ptpInterfaces: []
+      ptpRole: none
+      vfCount: 4
+      vfDriver: netdevice
+    - class: pci-sriov
+      dataNetworks: [fh4m]
+      lower: fh4
+      mtu: 9000
+      name: fh4m
+      platformNetworks: []
+      ptpInterfaces: []
+      ptpRole: none
+      vfCount: 4
+      vfDriver: netdevice
+    - class: pci-sriov
+      dataNetworks: [fh5m]
+      lower: fh5
+      mtu: 9000
+      name: fh5m
+      platformNetworks: []
+      ptpInterfaces: []
+      ptpRole: none
+      vfCount: 4
+      vfDriver: netdevice
+    vlan:
+    - class: platform
+      dataNetworks: []
+      lower: common0
+      name: mgmt0
+      platformNetworks:
+      - mgmt
+      ptpInterfaces: []
+      ptpRole: none
+      vid: 118
+    - class: platform
+      dataNetworks: []
+      lower: common0
+      name: cluster0
+      platformNetworks:
+      - cluster-host
+      ptpInterfaces: []
+      ptpRole: none
+      vid: 318
+    - class: platform
+      dataNetworks: []
+      lower: common0
+      name: oam0
+      platformNetworks:
+      - oam
+      ptpInterfaces: []
+      ptpRole: none
+      vid: 211
+  labels:
+    kube-cpu-mgr-policy: "static"
+    ptp-notification: "true"
+    ptp-registration: "true"
+    sriovdp: "enabled"
+  memory:
+  - functions:
+    - function: platform
+      pageCount: 4096000
+      pageSize: 4KB
+    - function: vm
+      pageCount: 64
+      pageSize: 1GB
+    node: 0
+  personality: controller
+  powerOn: true
+  processors:
+  - functions:
+    - count: 2
+      function: platform
+    - count: 23
+      function: application-isolated
+    node: 0
+  provisioningMode: static
+  ptpInstances:
+  - cl1
+  - phc-inst1
+  - ptp-inst1
+  - ptp-inst2
+  - ts1
+  rootDevice: /dev/disk/by-path/pci-0000:44:00.0-nvme-1
+  routes:
+  - gateway: 192.168.118.1
+    interface: mgmt0
+    metric: 1
+    prefix: 24
+    subnet: 192.168.100.0
+  storage:
+    filesystems:
+    - name: scratch
+      size: 100
+    - name: backup
+      size: 100
+    - name: docker
+      size: 200
+    - name: kubelet
+      size: 100
+    osds:
+    - cluster: ceph_cluster
+      function: osd
+      path: /dev/disk/by-path/pci-0000:45:00.0-nvme-1
+  subfunctions:
+  - controller
+  - worker
+---
+apiVersion: starlingx.windriver.com/v1
+kind: DataNetwork
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: ca
+  namespace: deployment
+spec:
+  mtu: 9000
+  type: flat
+---
+apiVersion: starlingx.windriver.com/v1
+kind: DataNetwork
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: f1c
+  namespace: deployment
+spec:
+  mtu: 1956
+  type: flat
+---
+apiVersion: starlingx.windriver.com/v1
+kind: DataNetwork
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: f1cc
+  namespace: deployment
+spec:
+  mtu: 1956
+  type: flat
+---
+apiVersion: starlingx.windriver.com/v1
+kind: DataNetwork
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: f1cu
+  namespace: deployment
+spec:
+  mtu: 1956
+  type: flat
+---
+apiVersion: starlingx.windriver.com/v1
+kind: DataNetwork
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: f1u
+  namespace: deployment
+spec:
+  mtu: 1956
+  type: flat
+---
+apiVersion: starlingx.windriver.com/v1
+kind: DataNetwork
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: fh0m
+  namespace: deployment
+spec:
+  mtu: 9000
+  type: flat
+---
+apiVersion: starlingx.windriver.com/v1
+kind: DataNetwork
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: fh1m
+  namespace: deployment
+spec:
+  mtu: 9000
+  type: flat
+---
+apiVersion: starlingx.windriver.com/v1
+kind: DataNetwork
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: fh2m
+  namespace: deployment
+spec:
+  mtu: 9000
+  type: flat
+---
+apiVersion: starlingx.windriver.com/v1
+kind: DataNetwork
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: fh3m
+  namespace: deployment
+spec:
+  mtu: 9000
+  type: flat
+---
+apiVersion: starlingx.windriver.com/v1
+kind: DataNetwork
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: fh4m
+  namespace: deployment
+spec:
+  mtu: 9000
+  type: flat
+---
+apiVersion: starlingx.windriver.com/v1
+kind: DataNetwork
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: fh5m
+  namespace: deployment
+spec:
+  mtu: 9000
+  type: flat
+---
+apiVersion: starlingx.windriver.com/v1
+kind: DataNetwork
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: fh0
+  namespace: deployment
+spec:
+  mtu: 9000
+  type: flat
+---
+apiVersion: starlingx.windriver.com/v1
+kind: DataNetwork
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: fh1
+  namespace: deployment
+spec:
+  mtu: 9000
+  type: flat
+---
+apiVersion: starlingx.windriver.com/v1
+kind: DataNetwork
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: fh2
+  namespace: deployment
+spec:
+  mtu: 9000
+  type: flat
+---
+apiVersion: starlingx.windriver.com/v1
+kind: DataNetwork
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: fh3
+  namespace: deployment
+spec:
+  mtu: 9000
+  type: flat
+---
+apiVersion: starlingx.windriver.com/v1
+kind: DataNetwork
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: fh4
+  namespace: deployment
+spec:
+  mtu: 9000
+  type: flat
+---
+apiVersion: starlingx.windriver.com/v1
+kind: DataNetwork
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: fh5
+  namespace: deployment
+spec:
+  mtu: 9000
+  type: flat
+---
+apiVersion: starlingx.windriver.com/v1
+kind: PtpInstance
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: cl1
+  namespace: deployment
+spec:
+  service: clock
+---
+apiVersion: starlingx.windriver.com/v1
+kind: PtpInstance
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: phc-inst1
+  namespace: deployment
+spec:
+  parameters:
+  - cmdline_opts=-s enp112s0f0 -O -37
+  service: phc2sys
+---
+apiVersion: starlingx.windriver.com/v1
+kind: PtpInstance
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: ptp-inst1
+  namespace: deployment
+spec:
+  parameters:
+  - tx_timestamp_timeout=1000
+  - logMinDelayReqInterval=-4
+  - logSyncInterval=-4
+  - domainNumber=24
+  - logAnnounceInterval=-3
+  - fault_reset_interval=0
+  - clock_servo=linreg
+  - network_transport=L2
+  service: ptp4l
+---
+apiVersion: starlingx.windriver.com/v1
+kind: PtpInstance
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: ptp-inst2
+  namespace: deployment
+spec:
+  parameters:
+  - domainNumber=24
+  - clock_servo=linreg
+  - network_transport=L2
+  - tx_timestamp_timeout=1000
+  - logMinDelayReqInterval=-4
+  - logSyncInterval=-4
+  - logAnnounceInterval=-3
+  - fault_reset_interval=0
+  service: ptp4l
+---
+apiVersion: starlingx.windriver.com/v1
+kind: PtpInstance
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: ts1
+  namespace: deployment
+spec:
+  parameters:
+  - ts2phc.nmea_serialport=/dev/ttyGNSS_7000_0
+  - use_syslog=1
+  - logging_level=7
+  service: ts2phc
+---
+apiVersion: starlingx.windriver.com/v1
+kind: PtpInterface
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: clint1
+  namespace: deployment
+spec:
+  parameters:
+  - synce_rclka=disabled
+  - sma2=output
+  - sma1=output
+  ptpinstance: cl1
+---
+apiVersion: starlingx.windriver.com/v1
+kind: PtpInterface
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: clint2
+  namespace: deployment
+spec:
+  parameters:
+  - sma2=input
+  - synce_rclka=disabled
+  ptpinstance: cl1
+---
+apiVersion: starlingx.windriver.com/v1
+kind: PtpInterface
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: clint3
+  namespace: deployment
+spec:
+  parameters:
+  - sma2=input
+  - synce_rclka=disabled
+  ptpinstance: cl1
+---
+apiVersion: starlingx.windriver.com/v1
+kind: PtpInterface
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: ptp-iface1
+  namespace: deployment
+spec:
+  parameters:
+  - masterOnly=1
+  ptpinstance: ptp-inst1
+---
+apiVersion: starlingx.windriver.com/v1
+kind: PtpInterface
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: ptp-iface2
+  namespace: deployment
+spec:
+  parameters:
+  - masterOnly=1
+  ptpinstance: ptp-inst2
+---
+apiVersion: starlingx.windriver.com/v1
+kind: PtpInterface
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: tsint1
+  namespace: deployment
+spec:
+  ptpinstance: ts1
+---

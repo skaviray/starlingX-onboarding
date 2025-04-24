@@ -45,6 +45,7 @@ CREATE TABLE nodes (
     parent_type VARCHAR(50) CHECK (parent_type IN ('system_controller', 'subcloud')) NOT NULL,
     parent_id INT NOT NULL,  -- Foreign key reference based on parent_type
     status VARCHAR(255) NOT NULL DEFAULT 'provisioning',
+    -- sysinv_config JSONB NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
