@@ -53,15 +53,15 @@ type Subcloud struct {
 }
 
 type SystemController struct {
-	ID             int32           `json:"id"`
-	Name           string          `json:"name"`
-	OamFloating    string          `json:"oam_floating"`
-	OamController0 string          `json:"oam_controller_0"`
-	OamController1 string          `json:"oam_controller_1"`
-	Config         json.RawMessage `json:"config"`
-	Status         string          `json:"status"`
-	IsInventoried  bool            `json:"is_inventoried"`
-	CreatedAt      sql.NullTime    `json:"created_at"`
+	ID            int32        `json:"id"`
+	Name          string       `json:"name"`
+	OamFloating   string       `json:"oam_floating"`
+	InstallFile   string       `json:"install_file"`
+	DeployFile    string       `json:"deploy_file"`
+	BootstrapFile string       `json:"bootstrap_file"`
+	Status        string       `json:"status"`
+	AdminPass     string       `json:"admin_pass"`
+	CreatedAt     sql.NullTime `json:"created_at"`
 }
 
 type User struct {

@@ -52,6 +52,7 @@ func (server *Server) setupRouter() {
 	addRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
 	addRoutes.POST("/systemcontrollers", server.CreateSystemController)
 	addRoutes.GET("/systemcontrollers", server.ListSystemControllers)
+	addRoutes.POST("/systemcontrollers/import", server.ImportSystemController)
 	addRoutes.GET("/systemcontrollers/:id", server.GetSystemControllerById)
 	addRoutes.GET("/systemcontrollers/:id/controllers", server.GetControllerNodesBySystemControllerID)
 	addRoutes.GET("/systemcontrollers/:id/storages", server.GetStorageNodesBySystemControllerID)

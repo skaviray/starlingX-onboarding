@@ -22,16 +22,17 @@ func main() {
 	}
 	log.Println("successfully connected to database..")
 	store := db.NewStore(conn)
-	
+
 	// Create default admin user during startup
 	if err := utils.CreateDefaultAdminUser(store); err != nil {
 		log.Printf("Warning: Failed to create admin user: %v", err)
 		// Continue application startup even if admin creation fails
 	}
-	
+
 	server, err := api.New(store, config)
 	if err != nil {
 		log.Println(err)
 	}
+	// go server.ListenForResponses()
 	server.Start(config.ListenAddress)
 }

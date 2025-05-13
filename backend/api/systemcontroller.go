@@ -3,8 +3,6 @@ package api
 import (
 	db "api/db/sqlc"
 	"api/utils"
-	"encoding/json"
-	"fmt"
 	"log"
 
 	// "log"
@@ -46,12 +44,18 @@ type SystemConfig struct {
 }
 
 type CreateSystemControllerReq struct {
-	Name             string       `json:"name"`
-	OAM_FLOATING_IP  string       `json:"oam_floating" binding:"required,ipv4"`
-	OAM_CONTROLLER_0 string       `json:"oam_controller_0" binding:"required,ipv4"`
-	OAM_CONTROLLER_1 string       `json:"oam_controller_1" binding:"required,ipv4"`
-	CONFIG           SystemConfig `json:"config" binding:"required"`
-	Status           string       `json:"status"`
+	Name           string `json:"name"`
+	OAM_FLOATING   string `json:"oam_floating" binding:"required,ipv4"`
+	DEPLOY_FILE    string `json:"deploy_file" binding:"required"`
+	INSTALL_FILE   string `json:"install_file" binding:"required"`
+	BOOTSTRAP_FILE string `json:"bootstrap_file" binding:"required"`
+	Status         string `json:"status"`
+}
+
+type ImportSystemControllerReq struct {
+	Name            string `json:"name" binding:"required"`
+	OAM_FLOATING_IP string `json:"oam_floating_ip" binding:"required,ipv4"`
+	ADMIN_PASS      string `json:"admin_pass" binding:"required"`
 }
 
 func (server *Server) CreateSystemController(ctx *gin.Context) {
@@ -62,20 +66,20 @@ func (server *Server) CreateSystemController(ctx *gin.Context) {
 	}
 
 	// Serialize config to JSON
-	configJSON, err := json.Marshal(scParams.CONFIG)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
-		return
-	}
+	// configJSON, err := json.Marshal(scParams.CONFIG)
+	// if err != nil {
+	// 	ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
+	// 	return
+	// }
 
 	args := db.CreateSystemControllerParams{
-		Name:           scParams.Name,
-		OamFloating:    scParams.OAM_FLOATING_IP,
-		OamController0: scParams.OAM_CONTROLLER_0,
-		OamController1: scParams.OAM_CONTROLLER_1,
-		Config:         configJSON,
-		Status:         "deploying",
-		// is_inventoried is false by default
+		Name:          scParams.Name,
+		OamFloating:   scParams.OAM_FLOATING,
+		DeployFile:    scParams.DEPLOY_FILE,
+		InstallFile:   scParams.INSTALL_FILE,
+		BootstrapFile: scParams.DEPLOY_FILE,
+		AdminPass:     "",
+		Status:        "creating",
 	}
 
 	systemController, err := server.store.CreateSystemController(ctx, args)
@@ -85,180 +89,211 @@ func (server *Server) CreateSystemController(ctx *gin.Context) {
 	}
 
 	// Now create nodes for this system controller
-	createdNodes := []db.Node{}
-	var createNodesError error = nil
+	// createdNodes := []db.Node{}
+	// var createNodesError error = nil
 
-	// Process controller nodes
-	for i, controllerConfig := range scParams.CONFIG.Controllers {
-		nodeName := systemController.Name + "-controller-" + fmt.Sprintf("%d", i)
+	// // Process controller nodes
+	// for i, controllerConfig := range scParams.CONFIG.Controllers {
+	// 	nodeName := systemController.Name + "-controller-" + fmt.Sprintf("%d", i)
 
-		// Use the hostname if provided, otherwise generate one
-		hostname := controllerConfig.HostName
-		if hostname == "" {
-			hostname = nodeName
-		}
+	// 	// Use the hostname if provided, otherwise generate one
+	// 	hostname := controllerConfig.HostName
+	// 	if hostname == "" {
+	// 		hostname = nodeName
+	// 	}
 
-		// Create the controller node
-		hashedPass, err := utils.CreateHashedPassword(controllerConfig.BM_PASS)
-		if err != nil {
-			createNodesError = err
-			break
-		}
+	// 	// Create the controller node
+	// 	hashedPass, err := utils.CreateHashedPassword(controllerConfig.BM_PASS)
+	// 	if err != nil {
+	// 		createNodesError = err
+	// 		break
+	// 	}
 
-		nodeArgs := db.CreateNodeParams{
-			Name:       nodeName,
-			Hostname:   hostname,
-			BmIp:       controllerConfig.BM_IP,
-			BmUser:     controllerConfig.BM_USER,
-			BmPass:     hashedPass,
-			Role:       "controller",
-			ParentType: "system_controller",
-			ParentID:   systemController.ID,
-		}
+	// 	nodeArgs := db.CreateNodeParams{
+	// 		Name:       nodeName,
+	// 		Hostname:   hostname,
+	// 		BmIp:       controllerConfig.BM_IP,
+	// 		BmUser:     controllerConfig.BM_USER,
+	// 		BmPass:     hashedPass,
+	// 		Role:       "controller",
+	// 		ParentType: "system_controller",
+	// 		ParentID:   systemController.ID,
+	// 	}
 
-		node, err := server.store.CreateNode(ctx, nodeArgs)
-		if err != nil {
-			createNodesError = err
-			break
-		}
+	// 	node, err := server.store.CreateNode(ctx, nodeArgs)
+	// 	if err != nil {
+	// 		createNodesError = err
+	// 		break
+	// 	}
 
-		createdNodes = append(createdNodes, node)
-		bmInfo := utils.BM_INFO{
-			BM_IP:   controllerConfig.BM_IP,
-			BM_USER: controllerConfig.BM_USER,
-			BM_PASS: controllerConfig.BM_PASS,
-		}
-		go func(bm_info utils.BM_INFO) {
-			biosData, err := utils.GetBiosAttributes(bm_info)
-			if err != nil {
-				log.Println("Unable to fetch the Bios information", err)
-			}
-			for attr_key, attr_value := range biosData {
-				value, ok := attr_value.(string)
-				if ok {
-					args := db.CreateBiosAttrParams{
-						NodeID:       node.ID,
-						SettingKey:   attr_key,
-						SettingValue: value,
-					}
-					_, err := server.store.CreateBiosAttr(ctx, args)
-					log.Println(err)
-				}
-			}
+	// 	createdNodes = append(createdNodes, node)
+	// 	bmInfo := utils.BM_INFO{
+	// 		BM_IP:   controllerConfig.BM_IP,
+	// 		BM_USER: controllerConfig.BM_USER,
+	// 		BM_PASS: controllerConfig.BM_PASS,
+	// 	}
+	// 	go func(bm_info utils.BM_INFO) {
+	// 		biosData, err := utils.GetBiosAttributes(bm_info)
+	// 		if err != nil {
+	// 			log.Println("Unable to fetch the Bios information", err)
+	// 		}
+	// 		for attr_key, attr_value := range biosData {
+	// 			value, ok := attr_value.(string)
+	// 			if ok {
+	// 				args := db.CreateBiosAttrParams{
+	// 					NodeID:       node.ID,
+	// 					SettingKey:   attr_key,
+	// 					SettingValue: value,
+	// 				}
+	// 				_, err := server.store.CreateBiosAttr(ctx, args)
+	// 				log.Println(err)
+	// 			}
+	// 		}
 
-			log.Println(biosData)
-		}(bmInfo)
-	}
+	// 		log.Println(biosData)
+	// 	}(bmInfo)
+	// }
 
-	// Process storage nodes if no error
-	if createNodesError == nil {
-		for i, storageConfig := range scParams.CONFIG.Storages {
-			nodeName := systemController.Name + "-storage-" + fmt.Sprintf("%d", i)
+	// // Process storage nodes if no error
+	// if createNodesError == nil {
+	// 	for i, storageConfig := range scParams.CONFIG.Storages {
+	// 		nodeName := systemController.Name + "-storage-" + fmt.Sprintf("%d", i)
 
-			// Use the hostname if provided, otherwise generate one
-			hostname := storageConfig.HostName
-			if hostname == "" {
-				hostname = nodeName
-			}
+	// 		// Use the hostname if provided, otherwise generate one
+	// 		hostname := storageConfig.HostName
+	// 		if hostname == "" {
+	// 			hostname = nodeName
+	// 		}
 
-			// Create the storage node
-			hashedPass, err := utils.CreateHashedPassword(storageConfig.BM_PASS)
-			if err != nil {
-				createNodesError = err
-				break
-			}
+	// 		// Create the storage node
+	// 		hashedPass, err := utils.CreateHashedPassword(storageConfig.BM_PASS)
+	// 		if err != nil {
+	// 			createNodesError = err
+	// 			break
+	// 		}
 
-			nodeArgs := db.CreateNodeParams{
-				Name:       nodeName,
-				Hostname:   hostname,
-				BmIp:       storageConfig.BM_IP,
-				BmUser:     storageConfig.BM_USER,
-				BmPass:     hashedPass,
-				Role:       "storage",
-				ParentType: "system_controller",
-				ParentID:   systemController.ID,
-			}
+	// 		nodeArgs := db.CreateNodeParams{
+	// 			Name:       nodeName,
+	// 			Hostname:   hostname,
+	// 			BmIp:       storageConfig.BM_IP,
+	// 			BmUser:     storageConfig.BM_USER,
+	// 			BmPass:     hashedPass,
+	// 			Role:       "storage",
+	// 			ParentType: "system_controller",
+	// 			ParentID:   systemController.ID,
+	// 		}
 
-			node, err := server.store.CreateNode(ctx, nodeArgs)
-			if err != nil {
-				createNodesError = err
-				break
-			}
+	// 		node, err := server.store.CreateNode(ctx, nodeArgs)
+	// 		if err != nil {
+	// 			createNodesError = err
+	// 			break
+	// 		}
 
-			createdNodes = append(createdNodes, node)
-		}
-	}
+	// 		createdNodes = append(createdNodes, node)
+	// 	}
+	// }
 
-	// Process worker nodes if no error
-	if createNodesError == nil {
-		for i, workerConfig := range scParams.CONFIG.Workers {
-			nodeName := systemController.Name + "-worker-" + fmt.Sprintf("%d", i)
+	// // Process worker nodes if no error
+	// if createNodesError == nil {
+	// 	for i, workerConfig := range scParams.CONFIG.Workers {
+	// 		nodeName := systemController.Name + "-worker-" + fmt.Sprintf("%d", i)
 
-			// Use the hostname if provided, otherwise generate one
-			hostname := workerConfig.HostName
-			if hostname == "" {
-				hostname = nodeName
-			}
+	// 		// Use the hostname if provided, otherwise generate one
+	// 		hostname := workerConfig.HostName
+	// 		if hostname == "" {
+	// 			hostname = nodeName
+	// 		}
 
-			// Create the worker node
-			hashedPass, err := utils.CreateHashedPassword(workerConfig.BM_PASS)
-			if err != nil {
-				createNodesError = err
-				break
-			}
+	// 		// Create the worker node
+	// 		hashedPass, err := utils.CreateHashedPassword(workerConfig.BM_PASS)
+	// 		if err != nil {
+	// 			createNodesError = err
+	// 			break
+	// 		}
 
-			nodeArgs := db.CreateNodeParams{
-				Name:       nodeName,
-				Hostname:   hostname,
-				BmIp:       workerConfig.BM_IP,
-				BmUser:     workerConfig.BM_USER,
-				BmPass:     hashedPass,
-				Role:       "worker",
-				ParentType: "system_controller",
-				ParentID:   systemController.ID,
-			}
+	// 		nodeArgs := db.CreateNodeParams{
+	// 			Name:       nodeName,
+	// 			Hostname:   hostname,
+	// 			BmIp:       workerConfig.BM_IP,
+	// 			BmUser:     workerConfig.BM_USER,
+	// 			BmPass:     hashedPass,
+	// 			Role:       "worker",
+	// 			ParentType: "system_controller",
+	// 			ParentID:   systemController.ID,
+	// 		}
 
-			node, err := server.store.CreateNode(ctx, nodeArgs)
-			if err != nil {
-				createNodesError = err
-				break
-			}
+	// 		node, err := server.store.CreateNode(ctx, nodeArgs)
+	// 		if err != nil {
+	// 			createNodesError = err
+	// 			break
+	// 		}
 
-			createdNodes = append(createdNodes, node)
-		}
-	}
+	// 		createdNodes = append(createdNodes, node)
+	// 	}
+	// }
 
 	// If all nodes are created successfully, update is_inventoried to true
-	if createNodesError == nil && len(createdNodes) > 0 {
-		updateArgs := db.UpdateSystemControllerInventoryParams{
-			ID:            systemController.ID,
-			IsInventoried: true,
-		}
+	// if createNodesError == nil && len(createdNodes) > 0 {
+	// 	updateArgs := db.UpdateSystemControllerInventoryParams{
+	// 		ID: systemController.ID,
+	// 	}
 
-		systemController, err = server.store.UpdateSystemControllerInventory(ctx, updateArgs)
-		if err != nil {
-			createNodesError = err
-		}
-	}
+	// 	systemController, err = server.store.UpdateSystemControllerInventory(ctx, updateArgs)
+	// 	if err != nil {
+	// 		createNodesError = err
+	// 	}
+	// }
 
 	// If there was an error creating nodes, return it
-	if createNodesError != nil {
-		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(createNodesError))
-		return
-	}
+	// if createNodesError != nil {
+	// 	ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(createNodesError))
+	// 	return
+	// }
 
 	// Create a response that includes both the system controller and nodes
-	type EnhancedSystemControllerResponse struct {
-		SystemController db.SystemController `json:"system_controller"`
-		Nodes            []db.Node           `json:"nodes"`
-	}
+	// type EnhancedSystemControllerResponse struct {
+	// 	SystemController db.SystemController `json:"system_controller"`
+	// 	Nodes            []db.Node           `json:"nodes"`
+	// }
 
-	response := EnhancedSystemControllerResponse{
-		SystemController: systemController,
-		Nodes:            createdNodes,
-	}
+	// response :={
+	// 	SystemController: systemController,
+	// }
 
-	ctx.JSON(http.StatusOK, response)
+	ctx.JSON(http.StatusOK, systemController)
+}
+
+func (server *Server) ImportSystemController(ctx *gin.Context) {
+	var req ImportSystemControllerReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, utils.ErrorResponse(err))
+		return
+	}
+	params := db.CreateSystemControllerParams{
+		Name:          req.Name,
+		OamFloating:   req.OAM_FLOATING_IP,
+		AdminPass:     req.ADMIN_PASS,
+		InstallFile:   "",
+		BootstrapFile: "",
+		DeployFile:    "",
+		Status:        "importing",
+	}
+	sc, err := server.store.CreateSystemController(ctx, params)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
+		return
+	}
+	message := Message{
+		Id:     sc.ID,
+		Action: "import",
+	}
+	if err := SendToQueue(message); err != nil {
+		log.Println(err)
+		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
+		return
+	}
+	log.Println(message)
+	ctx.JSON(http.StatusCreated, sc)
 }
 
 // type ListSystemControllerParams struct {

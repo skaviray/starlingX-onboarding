@@ -1,7 +1,7 @@
 -- name: CreateSystemController :one
 INSERT INTO system_controller 
-(name,oam_floating,oam_controller_0,oam_controller_1,config,status) 
-VALUES ($1,$2,$3,$4,$5,$6) RETURNING *;
+(name,oam_floating,install_file,deploy_file,bootstrap_file,status, admin_pass) 
+VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *;
 
 -- name: GetSystemController :one
 SELECT * FROM system_controller
@@ -20,6 +20,12 @@ WHERE id = $1;
 
 -- name: UpdateSystemControllerInventory :one
 UPDATE system_controller
-SET is_inventoried = $2
+SET oam_floating = $2
+WHERE id = $1
+RETURNING *;
+
+-- name: UpdateSystemControllerAdminPass :one
+UPDATE system_controller
+SET admin_pass = $2
 WHERE id = $1
 RETURNING *;

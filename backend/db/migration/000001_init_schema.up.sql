@@ -9,15 +9,21 @@ CREATE TABLE "users" (
 );
 
 
+-- TODO: 
+-- - arrange the parameters in an order
 CREATE TABLE system_controller (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) UNIQUE NOT NULL,
     oam_floating VARCHAR(45) UNIQUE NOT NULL,
-    oam_controller_0  VARCHAR(45) UNIQUE NOT NULL,
-    oam_controller_1  VARCHAR(45) UNIQUE NOT NULL,
-    config JSONB NOT NULL,
-    status VARCHAR(50) CHECK (status IN ('active', 'maintenance', 'error', 'deploying')) NOT NULL,
-    is_inventoried BOOLEAN NOT NULL DEFAULT FALSE,
+    -- oam_controller_0  VARCHAR(45) UNIQUE NOT NULL,
+    -- oam_controller_1  VARCHAR(45) UNIQUE NOT NULL,
+    -- config JSONB NOT NULL,
+    install_file varchar(255) NOT NULL,
+    deploy_file varchar(255) NOT NULL,
+    bootstrap_file varchar(255) NOT NULL,
+    status VARCHAR(50) CHECK (status IN ('deployed', 'imported', 'maintenance', 'error', 'deploying', 'importing')) NOT NULL,
+    admin_pass varchar(50) NOT NULL,
+    -- is_inventoried BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

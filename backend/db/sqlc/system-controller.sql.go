@@ -7,43 +7,44 @@ package db
 
 import (
 	"context"
-	"encoding/json"
 )
 
 const createSystemController = `-- name: CreateSystemController :one
 INSERT INTO system_controller 
-(name,oam_floating,oam_controller_0,oam_controller_1,config,status) 
-VALUES ($1,$2,$3,$4,$5,$6) RETURNING id, name, oam_floating, oam_controller_0, oam_controller_1, config, status, is_inventoried, created_at
+(name,oam_floating,install_file,deploy_file,bootstrap_file,status, admin_pass) 
+VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id, name, oam_floating, install_file, deploy_file, bootstrap_file, status, admin_pass, created_at
 `
 
 type CreateSystemControllerParams struct {
-	Name           string          `json:"name"`
-	OamFloating    string          `json:"oam_floating"`
-	OamController0 string          `json:"oam_controller_0"`
-	OamController1 string          `json:"oam_controller_1"`
-	Config         json.RawMessage `json:"config"`
-	Status         string          `json:"status"`
+	Name          string `json:"name"`
+	OamFloating   string `json:"oam_floating"`
+	InstallFile   string `json:"install_file"`
+	DeployFile    string `json:"deploy_file"`
+	BootstrapFile string `json:"bootstrap_file"`
+	Status        string `json:"status"`
+	AdminPass     string `json:"admin_pass"`
 }
 
 func (q *Queries) CreateSystemController(ctx context.Context, arg CreateSystemControllerParams) (SystemController, error) {
 	row := q.db.QueryRowContext(ctx, createSystemController,
 		arg.Name,
 		arg.OamFloating,
-		arg.OamController0,
-		arg.OamController1,
-		arg.Config,
+		arg.InstallFile,
+		arg.DeployFile,
+		arg.BootstrapFile,
 		arg.Status,
+		arg.AdminPass,
 	)
 	var i SystemController
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
 		&i.OamFloating,
-		&i.OamController0,
-		&i.OamController1,
-		&i.Config,
+		&i.InstallFile,
+		&i.DeployFile,
+		&i.BootstrapFile,
 		&i.Status,
-		&i.IsInventoried,
+		&i.AdminPass,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -63,7 +64,7 @@ func (q *Queries) DeleteSystemController(ctx context.Context, id int32) error {
 }
 
 const getSystemController = `-- name: GetSystemController :one
-SELECT id, name, oam_floating, oam_controller_0, oam_controller_1, config, status, is_inventoried, created_at FROM system_controller
+SELECT id, name, oam_floating, install_file, deploy_file, bootstrap_file, status, admin_pass, created_at FROM system_controller
 WHERE id = $1
 LIMIT 1
 `
@@ -75,18 +76,18 @@ func (q *Queries) GetSystemController(ctx context.Context, id int32) (SystemCont
 		&i.ID,
 		&i.Name,
 		&i.OamFloating,
-		&i.OamController0,
-		&i.OamController1,
-		&i.Config,
+		&i.InstallFile,
+		&i.DeployFile,
+		&i.BootstrapFile,
 		&i.Status,
-		&i.IsInventoried,
+		&i.AdminPass,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const listSystemController = `-- name: ListSystemController :many
-SELECT id, name, oam_floating, oam_controller_0, oam_controller_1, config, status, is_inventoried, created_at FROM system_controller
+SELECT id, name, oam_floating, install_file, deploy_file, bootstrap_file, status, admin_pass, created_at FROM system_controller
 ORDER BY id
 `
 
@@ -103,11 +104,11 @@ func (q *Queries) ListSystemController(ctx context.Context) ([]SystemController,
 			&i.ID,
 			&i.Name,
 			&i.OamFloating,
-			&i.OamController0,
-			&i.OamController1,
-			&i.Config,
+			&i.InstallFile,
+			&i.DeployFile,
+			&i.BootstrapFile,
 			&i.Status,
-			&i.IsInventoried,
+			&i.AdminPass,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err
@@ -123,30 +124,59 @@ func (q *Queries) ListSystemController(ctx context.Context) ([]SystemController,
 	return items, nil
 }
 
-const updateSystemControllerInventory = `-- name: UpdateSystemControllerInventory :one
+const updateSystemControllerAdminPass = `-- name: UpdateSystemControllerAdminPass :one
 UPDATE system_controller
-SET is_inventoried = $2
+SET admin_pass = $2
 WHERE id = $1
-RETURNING id, name, oam_floating, oam_controller_0, oam_controller_1, config, status, is_inventoried, created_at
+RETURNING id, name, oam_floating, install_file, deploy_file, bootstrap_file, status, admin_pass, created_at
 `
 
-type UpdateSystemControllerInventoryParams struct {
-	ID            int32 `json:"id"`
-	IsInventoried bool  `json:"is_inventoried"`
+type UpdateSystemControllerAdminPassParams struct {
+	ID        int32  `json:"id"`
+	AdminPass string `json:"admin_pass"`
 }
 
-func (q *Queries) UpdateSystemControllerInventory(ctx context.Context, arg UpdateSystemControllerInventoryParams) (SystemController, error) {
-	row := q.db.QueryRowContext(ctx, updateSystemControllerInventory, arg.ID, arg.IsInventoried)
+func (q *Queries) UpdateSystemControllerAdminPass(ctx context.Context, arg UpdateSystemControllerAdminPassParams) (SystemController, error) {
+	row := q.db.QueryRowContext(ctx, updateSystemControllerAdminPass, arg.ID, arg.AdminPass)
 	var i SystemController
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
 		&i.OamFloating,
-		&i.OamController0,
-		&i.OamController1,
-		&i.Config,
+		&i.InstallFile,
+		&i.DeployFile,
+		&i.BootstrapFile,
 		&i.Status,
-		&i.IsInventoried,
+		&i.AdminPass,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const updateSystemControllerInventory = `-- name: UpdateSystemControllerInventory :one
+UPDATE system_controller
+SET oam_floating = $2
+WHERE id = $1
+RETURNING id, name, oam_floating, install_file, deploy_file, bootstrap_file, status, admin_pass, created_at
+`
+
+type UpdateSystemControllerInventoryParams struct {
+	ID          int32  `json:"id"`
+	OamFloating string `json:"oam_floating"`
+}
+
+func (q *Queries) UpdateSystemControllerInventory(ctx context.Context, arg UpdateSystemControllerInventoryParams) (SystemController, error) {
+	row := q.db.QueryRowContext(ctx, updateSystemControllerInventory, arg.ID, arg.OamFloating)
+	var i SystemController
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.OamFloating,
+		&i.InstallFile,
+		&i.DeployFile,
+		&i.BootstrapFile,
+		&i.Status,
+		&i.AdminPass,
 		&i.CreatedAt,
 	)
 	return i, err

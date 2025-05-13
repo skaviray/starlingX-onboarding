@@ -55,9 +55,14 @@ export const api = {
         });
 
         if (!response.ok) {
-            throw new Error('Request failed');
+            let errorMessage = "Request Failed"
+            try {
+                const errorData = await response.json();
+                errorMessage = errorData.error || errorMessage;
+            }
+            catch (_){}
+            throw new Error(errorMessage);
         }
-
         return response.json();
     },
 

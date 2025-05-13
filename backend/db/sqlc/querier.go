@@ -39,6 +39,7 @@ type Querier interface {
 	ListNodes(ctx context.Context, arg ListNodesParams) ([]Node, error)
 	ListSubclouds(ctx context.Context) ([]Subcloud, error)
 	ListSystemController(ctx context.Context) ([]SystemController, error)
+	UpdateSystemControllerAdminPass(ctx context.Context, arg UpdateSystemControllerAdminPassParams) (SystemController, error)
 	UpdateSystemControllerInventory(ctx context.Context, arg UpdateSystemControllerInventoryParams) (SystemController, error)
 }
 
