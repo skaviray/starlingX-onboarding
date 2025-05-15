@@ -12,6 +12,7 @@ type Config struct {
 	ListenAddress string        `mapstructure:"LISTEN_ADDRESS"`
 	SecretKey     string        `mapstructure:"SECRET_KEY"`
 	Duration      time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
+	AMQP_URL      string        `mapstructure:"AMQP_URL"`
 }
 
 func LoadConfig(path string) (config Config, err error) {

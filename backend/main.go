@@ -11,11 +11,14 @@ import (
 )
 
 func main() {
-	config, err := utils.LoadConfig(".")
+	config, err := utils.LoadConfig("/app/")
 	if err != nil {
 		log.Fatalf("unable to load the config file %e", err)
 	}
-
+	if config.AMQP_URL == "" {
+		log.Panic("AMQP_URL is not defined...")
+	}
+	utils.WaitForPostgres(config.DBSource)
 	conn, err := sql.Open(config.DBDriver, config.DBSource)
 	if err != nil {
 		log.Fatalf("cannot connect to db %e", err)

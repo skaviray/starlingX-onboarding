@@ -6,7 +6,23 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"time"
 )
+
+func WaitForPostgres(dsn string) {
+	for {
+		db, err := sql.Open("postgres", dsn)
+		if err == nil {
+			if err = db.Ping(); err == nil {
+				db.Close()
+				fmt.Println("Postgres is ready!")
+				break
+			}
+		}
+		fmt.Println("Waiting for Postgres...")
+		time.Sleep(2 * time.Second)
+	}
+}
 
 // CreateDefaultAdminUser creates a default admin user if it doesn't already exist
 func CreateDefaultAdminUser(store db.Store) error {

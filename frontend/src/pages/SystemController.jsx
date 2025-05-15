@@ -42,11 +42,26 @@ function SystemController() {
     }
   };
 
-  const handleCreate = async () => {
-    console.log("Created")
-  };
-  
+  // const handleCreate = async () => {
+  //   console.log("Created")
+  // };
 
+  const handleCreate = async () => {
+    try {    
+      console.log(systemController)
+      await api.post('/systemcontrollers/', systemController);
+      resetImportModal()
+      console.log(systemController)
+    }
+    catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        const backendError = error.response.data?.error || "Unknown backend error";
+        alert(`Import failed:\n${backendError}`);
+      } else {
+        alert(`${error.message}`);
+      }
+    }
+  }
 
   if (isLoading) {
     return (

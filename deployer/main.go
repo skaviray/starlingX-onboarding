@@ -50,15 +50,20 @@ func main() {
 	if err := authClient.GetToken(); err != nil {
 		log.Println(err)
 	}
-	log.Print(authClient.Token)
-	// GET the hosts
-	hosts, err := authClient.GetHosts()
+	// log.Print(authClient.Token)
+	// // GET the hosts
+	// hosts, err := authClient.GetHosts()
+	// if err != nil {
+	// 	log.Println(err)
+	// }
+	// for _, host := range hosts {
+	// 	log.Println(host.ID)
+	// }
+	config, err := authClient.GetSystemConfig()
 	if err != nil {
 		log.Println(err)
 	}
-	for _, host := range hosts {
-		log.Println(host.ID)
-	}
+	log.Println(config)
 	// err = authClient.LockHost(1)
 	// if err != nil {
 	// 	log.Println(err)

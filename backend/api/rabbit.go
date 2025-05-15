@@ -12,15 +12,15 @@ type ImportRequest struct {
 	Tag  int    `json:"tag"`
 }
 
-var amqpURI = "amqp://user:Li69nux*@localhost:5672/" // RabbitMQ URI
+// var amqpURI = "" // RabbitMQ URI
 
 type Message struct {
 	Id     int32  `json:"id"`
 	Action string `json:"action"`
 }
 
-func SendToQueue(msg Message) error {
-	conn, err := amqp091.Dial(amqpURI)
+func (server *Server) SendToQueue(msg Message) error {
+	conn, err := amqp091.Dial(server.config.AMQP_URL)
 	if err != nil {
 		return fmt.Errorf("failed to connect to RabbitMQ: %w", err)
 	}

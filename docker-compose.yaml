@@ -1,5 +1,61 @@
-# version: '3.9'
+version: "3.9"
+
 services:
+  frontend:
+    image: stx-frontend:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - HOST=0.0.0.0
+      - REACT_APP_BACKEND_URL=http://backend:8080
+    depends_on:
+      - backend
+
+  backend:
+    image: stx-backend:v4
+    volumes:
+    - ./backend/app.env:/app/app.env:ro 
+    env_file:
+      - ./backend/app.env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+
+  db:
+    image: postgres:14-alpine
+    hostname: rabbitmq
+    ports:
+      - "5434:5432"
+    volumes:
+      - ~/distributed-cloud/postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: root
+      POSTGRES_DB: distributed-cloud
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      - rabbitmq
+
+  migrate:
+    image: migrate/migrate  # official migrate CLI image
+    depends_on:
+      - db
+    volumes:
+      - ./backend/db/migration:/db/migration
+    command: [
+      "-path", "/db/migration",
+      "-database", "postgresql://root:admin@db:5432/distributed-cloud?sslmode=disable",
+      "up"
+    ]
+    restart: "on-failure"
+
   rabbitmq:
     image: rabbitmq:management
     container_name: rabbitmq
@@ -13,3 +69,13 @@ services:
       RABBITMQ_DEFAULT_PASS: "Li69nux*"
 volumes:
   rabbitmq_data:
+  # distributed-cloud-db:
+  #   image: postgres:14-alpine
+  #   ports:
+  #     - 5434:5432
+  #   volumes:
+  #     - ~/distributed-cloud/postgres:/var/lib/postgresql/data
+  #   environment:
+  #     - POSTGRES_PASSWORD=admin
+  #     - POSTGRES_USER=root
+  #     - POSTGRES_DB=distributed-cloud

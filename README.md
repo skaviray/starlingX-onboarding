@@ -57,7 +57,7 @@ Frontend ⇄ Backend ⇄ Database
                    ⇓
               RabbitMQ
                    ⇓
-               Deployer
+               Worker
 ```
 ## 🧑‍💻 Development Environment Setup
 
@@ -68,7 +68,7 @@ Frontend ⇄ Backend ⇄ Database
 - Git
 - Node.js & npm (for frontend)
 - Go (for backend)
-- Python 3 (for deployer, if used)
+- golang-migrate
 
 ### 🏗️ Setup Instructions
 
@@ -77,31 +77,10 @@ git clone https://github.com/skaviray/starlingX-onboarding
 cd starlingX-onboarding
 ```
 
-- Start the frontend
-```bash
-# cd frontend
-# npm start
-Compiled successfully!
-
-You can now view frontend in the browser.
-
-  http://localhost:3000
-
-Note that the development build is not optimized.
-To create a production build, use npm run build.
-
-webpack compiled successfully
-
-```
-
-- Start the Backend
+- Start the application
 
 ```bash
-cd backend
-make postgres-setup
-make createdb
-make migrate-up
-make start-server
+docker-compose up -d
 ```
 
 - Access the Dashboard at http://localhost:3000/login
