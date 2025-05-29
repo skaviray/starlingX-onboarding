@@ -37,6 +37,8 @@ func (consumer *Consumer) ImportSystemController(id int32) {
 		return
 	}
 	log.Println(client.Token)
+	log.Println(client.DcManagerEndpoint)
+	log.Println(client.SysInvEndpoint)
 	// if err := auth.GetToken(); err != nil {
 	// 	log.Println(err)
 	// 	staus := db.UpdateSystemControllerStatusParams{

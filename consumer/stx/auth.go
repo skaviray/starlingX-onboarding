@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -63,6 +64,37 @@ func (c *StarlingXClient) authenticate() error {
 	if token == "" {
 		return fmt.Errorf("unable to fetch the token from %s", url)
 	}
+	var tokenResponse TokenResponse
+	err = json.NewDecoder(res.Body).Decode(&tokenResponse)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	for _, element := range tokenResponse.Token.Catalog {
+		log.Println(element.Type)
+		if element.Type == "platform" {
+			for _, endpoint := range element.Endpoints {
+				log.Println(endpoint.Interface)
+				if endpoint.Interface == "public" {
+					log.Printf("SYSINV: %s", endpoint.URL)
+					c.SysInvEndpoint = endpoint.URL
+				}
+			}
+
+		}
+		if element.Type == "dcmanager" {
+			for _, endpoint := range element.Endpoints {
+				if endpoint.Interface == "public" {
+					log.Println(endpoint.Interface)
+					log.Printf("DCMANAGER: %s", endpoint.URL)
+					c.DcManagerEndpoint = endpoint.URL
+				}
+			}
+
+		}
+
+	}
+	log.Println(tokenResponse.Token.Catalog)
 	c.Token = token
 	return nil
 }

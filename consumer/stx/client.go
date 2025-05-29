@@ -2,19 +2,21 @@ package stx
 
 import (
 	"crypto/tls"
+	"fmt"
 	"log"
 	"net/http"
 )
 
 type StarlingXClient struct {
-	Username string
-	Password string
-	Domain   string
-	Project  string
-	AuthURL  string
-
-	Token    string
-	TenantID string
+	Username          string
+	Password          string
+	Domain            string
+	Project           string
+	AuthURL           string
+	Token             string
+	TenantID          string
+	SysInvEndpoint    string
+	DcManagerEndpoint string
 }
 
 func NewClient(username, password, domain, project, authURL string) (*StarlingXClient, error) {
@@ -44,8 +46,10 @@ func (c *StarlingXClient) NewHttpClient() *http.Client {
 	return &client
 }
 
-func (c *StarlingXClient) NewHttpRequest(method, endpoint string) *http.Request {
-	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+func (c *StarlingXClient) NewHttpRequest(method, endpoint, path string) *http.Request {
+	url := fmt.Sprintf("%s/%s", endpoint, path)
+	log.Println(url)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil
 	}
