@@ -28,5 +28,4 @@ func main() {
 	store := db.NewStore(conn)
 	consumer := src.New(store, config)
 	consumer.StartConsumer()
-
 }

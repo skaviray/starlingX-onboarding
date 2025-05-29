@@ -213,13 +213,13 @@ func (server *Server) GetSystemControllerById(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
-	client, err := stx.NewClient("admin", systemController.AdminPass, "Default", "admin", systemController.OamFloating)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
-		return
-	}
 	var res SystemControllerRes
 	if systemController.Link != "" {
+		client, err := stx.NewClient("admin", systemController.AdminPass, "Default", "admin", systemController.OamFloating)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
+			return
+		}
 		system, err := client.GetSystemConfig(systemController.Link)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
@@ -234,6 +234,7 @@ func (server *Server) GetSystemControllerById(ctx *gin.Context) {
 			BOOTSTRAP_FILE: systemController.BootstrapFile,
 			Status:         systemController.Status,
 			Config:         system,
+			Failed_Reason:  systemController.FailedReason,
 			CreatedAt:      systemController.CreatedAt.Time,
 		}
 	} else {
@@ -246,6 +247,7 @@ func (server *Server) GetSystemControllerById(ctx *gin.Context) {
 			BOOTSTRAP_FILE: systemController.BootstrapFile,
 			Status:         systemController.Status,
 			Config:         stx.ISystem{},
+			Failed_Reason:  systemController.FailedReason,
 			CreatedAt:      systemController.CreatedAt.Time,
 		}
 	}
