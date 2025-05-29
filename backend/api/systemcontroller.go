@@ -2,14 +2,60 @@ package api
 
 import (
 	db "api/db/sqlc"
+	"api/stx"
 	"api/utils"
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
+type ISystemsResponse struct {
+	Isystems []ISystem `json:"isystems"`
+}
+
+type ISystem struct {
+	UUID            string        `json:"uuid"`
+	SoftwareVersion string        `json:"software_version"`
+	Name            string        `json:"name"`
+	Links           []SystemLinks `json:"links"`
+	CreatedAt       string        `json:"created_at"`
+	UpdatedAt       string        `json:"updated_at"`
+	Contact         *string       `json:"contact"`
+	Location        *string       `json:"location"`
+	Latitude        *string       `json:"latitude"`
+	Longitude       *string       `json:"longitude"`
+	Description     string        `json:"description"`
+	SystemType      string        `json:"system_type"`
+	SystemMode      string        `json:"system_mode"`
+	Timezone        string        `json:"timezone"`
+	Capabilities    Capabilities  `json:"capabilities"`
+}
+
+type Capabilities struct {
+	SdnEnabled     bool   `json:"sdn_enabled"`
+	SharedServices string `json:"shared_services"`
+	VswitchType    string `json:"vswitch_type"`
+	BmRegion       string `json:"bm_region"`
+	HttpsEnabled   bool   `json:"https_enabled"`
+	CinderBackend  string `json:"cinder_backend"`
+}
+
+type SystemLinks struct {
+	Href string `json:"href"`
+	Rel  string `json:"rel"`
+}
+
+type SystemCapabilities struct {
+	SdnEnabled     bool   `json:"sdn_enabled"`
+	SharedServices string `json:"shared_services"`
+	BMRegion       string `json:"bm_region"`
+	CinderBackend  string `json:"cinder_backend"`
+	HTTPSEnabled   bool   `json:"https_enabled"`
+	RegionConfig   bool   `json:"region_config"`
+}
 type NodeConfig struct {
 	BM_IP       string   `json:"bm_ip" binding:"required,ipv4"`
 	BM_USER     string   `json:"bm_user" binding:"required"`
@@ -48,6 +94,19 @@ type CreateSystemControllerReq struct {
 	INSTALL_FILE   string `json:"install_file" binding:"required"`
 	BOOTSTRAP_FILE string `json:"bootstrap_file" binding:"required"`
 	Status         string `json:"status"`
+}
+
+type SystemControllerRes struct {
+	Id             int32       `json:"id"`
+	Name           string      `json:"name"`
+	OAM_FLOATING   string      `json:"oam_floating" binding:"required,ipv4"`
+	DEPLOY_FILE    string      `json:"deploy_file" binding:"required"`
+	INSTALL_FILE   string      `json:"install_file" binding:"required"`
+	BOOTSTRAP_FILE string      `json:"bootstrap_file" binding:"required"`
+	Status         string      `json:"status"`
+	Failed_Reason  string      `json:"failed_reason"`
+	Config         stx.ISystem `json:"config"`
+	CreatedAt      time.Time   `json:"created_at"`
 }
 
 type ImportSystemControllerReq struct {
@@ -110,6 +169,7 @@ func (server *Server) ImportSystemController(ctx *gin.Context) {
 		BootstrapFile: "",
 		DeployFile:    "",
 		Status:        "importing",
+		FailedReason:  "",
 	}
 	sc, err := server.store.CreateSystemController(ctx, params)
 	if err != nil {
@@ -153,7 +213,43 @@ func (server *Server) GetSystemControllerById(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
 		return
 	}
-	ctx.JSON(http.StatusOK, systemController)
+	client, err := stx.NewClient("admin", systemController.AdminPass, "Default", "admin", systemController.OamFloating)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
+		return
+	}
+	var res SystemControllerRes
+	if systemController.Link != "" {
+		system, err := client.GetSystemConfig(systemController.Link)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, utils.ErrorResponse(err))
+			return
+		}
+		res = SystemControllerRes{
+			Id:             systemController.ID,
+			Name:           systemController.Name,
+			OAM_FLOATING:   systemController.OamFloating,
+			INSTALL_FILE:   systemController.InstallFile,
+			DEPLOY_FILE:    systemController.DeployFile,
+			BOOTSTRAP_FILE: systemController.BootstrapFile,
+			Status:         systemController.Status,
+			Config:         system,
+			CreatedAt:      systemController.CreatedAt.Time,
+		}
+	} else {
+		res = SystemControllerRes{
+			Id:             systemController.ID,
+			Name:           systemController.Name,
+			OAM_FLOATING:   systemController.OamFloating,
+			INSTALL_FILE:   systemController.InstallFile,
+			DEPLOY_FILE:    systemController.DeployFile,
+			BOOTSTRAP_FILE: systemController.BootstrapFile,
+			Status:         systemController.Status,
+			Config:         stx.ISystem{},
+			CreatedAt:      systemController.CreatedAt.Time,
+		}
+	}
+	ctx.JSON(http.StatusOK, res)
 }
 
 func (server *Server) GetControllerNodesBySystemControllerID(ctx *gin.Context) {

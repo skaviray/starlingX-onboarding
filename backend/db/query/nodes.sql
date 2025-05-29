@@ -5,11 +5,12 @@ INSERT INTO nodes (
   bm_ip,
   bm_user,
   bm_pass,
+  link,
   role,
   parent_type,
   parent_id
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8
+  $1, $2, $3, $4, $5, $6, $7, $8, $9
 )
 RETURNING *;
 

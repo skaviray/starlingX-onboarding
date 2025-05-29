@@ -11,24 +11,24 @@ postgres-destroy:
 	rm -rf ~/distributed-cloud/postgres
 
 createdb:
-	docker exec -it backend-distributed-cloud-1  createdb --username=root --owner=root distributed-cloud
+	docker exec -it backend-db-1  createdb --username=root --owner=root distributed-cloud
 
 dropdb:
-	docker exec -it backend-distributed-cloud-1   dropdb distributed-cloud
+	docker exec -it backend-db-1  dropdb distributed-cloud
 
 
 migrate-create: 
 	migrate create --ext sql -dir db/migration -seq init_schema
 
 migrate-up:
-	migrate -path db/migration -database "postgresql://root:admin@localhost:5434/distributed-cloud?sslmode=disable" -verbose up
+	migrate -path db/migration -database "postgresql://root:admin@db:5432/distributed-cloud?sslmode=disable" -verbose up
 
 migrate-down:
-	migrate -path db/migration -database "postgresql://root:admin@localhost:5434/distributed-cloud?sslmode=disable" -verbose down 
+	migrate -path db/migration -database "postgresql://root:admin@db:5432/distributed-cloud?sslmode=disable" -verbose down 
 
 sqlc:
-	go run github.com/sqlc-dev/sqlc/cmd/sqlc generate
-	//docker run --rm -v "C:\Users\skaviray\Documents\Cursor\starlingX-onboarding\backend:/src" -w /src sqlc/sqlc generate
+	sqlc generate
+	# //docker run --rm -v "C:\Users\skaviray\Documents\Cursor\starlingX-onboarding\backend:/src" -w /src sqlc/sqlc generate
 
 test:
 	go test -v -cover ./...

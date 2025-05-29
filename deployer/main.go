@@ -52,18 +52,26 @@ func main() {
 	}
 	// log.Print(authClient.Token)
 	// // GET the hosts
-	// hosts, err := authClient.GetHosts()
-	// if err != nil {
-	// 	log.Println(err)
-	// }
-	// for _, host := range hosts {
-	// 	log.Println(host.ID)
+	hosts, err := authClient.GetHosts()
+	if err != nil {
+		log.Println(err)
+	}
+	for _, host := range hosts {
+		log.Println(host.Links)
+		log.Println(host.ID)
+	}
+	// nodeParams := db.UpdateNodePropertiesParams{
+
 	// }
 	config, err := authClient.GetSystemConfig()
 	if err != nil {
 		log.Println(err)
 	}
 	log.Println(config)
+	// if err != nil {
+	// 	log.Println(err)
+	// }
+	// log.Println(config)
 	// err = authClient.LockHost(1)
 	// if err != nil {
 	// 	log.Println(err)

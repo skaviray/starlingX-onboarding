@@ -21,7 +21,9 @@ CREATE TABLE system_controller (
     install_file varchar(255) NOT NULL,
     deploy_file varchar(255) NOT NULL,
     bootstrap_file varchar(255) NOT NULL,
-    status VARCHAR(50) CHECK (status IN ('deployed', 'imported', 'maintenance', 'error', 'deploying', 'importing')) NOT NULL,
+    link varchar(255) NOT NULL DEFAULT 'NA',
+    status VARCHAR(50) CHECK (status IN ('deployed', 'imported', 'maintenance', 'error', 'deploying', 'importing','failed-import')) NOT NULL,
+    failed_reason varchar(255) NOT NULL,
     admin_pass varchar(50) NOT NULL,
     -- is_inventoried BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -47,6 +49,7 @@ CREATE TABLE nodes (
     bm_ip VARCHAR(45) UNIQUE NOT NULL,
     bm_user VARCHAR(45) NOT NULL,
     bm_pass VARCHAR(255) NOT NULL,
+    link varchar(255) NOT NULL DEFAULT 'NA',
     role VARCHAR(50) CHECK (role IN ('controller', 'worker', 'storage', 'aio')) NOT NULL,
     parent_type VARCHAR(50) CHECK (parent_type IN ('system_controller', 'subcloud')) NOT NULL,
     parent_id INT NOT NULL,  -- Foreign key reference based on parent_type

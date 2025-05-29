@@ -1,7 +1,7 @@
 -- name: CreateSystemController :one
 INSERT INTO system_controller 
-(name,oam_floating,install_file,deploy_file,bootstrap_file,status, admin_pass) 
-VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *;
+(name,oam_floating,install_file,deploy_file,bootstrap_file,link,status, failed_reason, admin_pass) 
+VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *;
 
 -- name: GetSystemController :one
 SELECT * FROM system_controller

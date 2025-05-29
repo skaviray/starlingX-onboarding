@@ -19,59 +19,59 @@ type IHostResponse struct {
 	IHosts []IHost `json:"ihosts"`
 }
 type IHost struct {
-	ID                   int          `json:"id"`
-	UUID                 string       `json:"uuid"`
-	Hostname             string       `json:"hostname"`
-	InvProvision         string       `json:"invprovision"`
-	MgmtMAC              string       `json:"mgmt_mac"`
-	MgmtIP               string       `json:"mgmt_ip"`
-	BMIP                 string       `json:"bm_ip"`
-	BMType               string       `json:"bm_type"`
-	BMUsername           string       `json:"bm_username"`
-	Personality          string       `json:"personality"`
-	Subfunctions         string       `json:"subfunctions"`
-	SubfunctionOper      string       `json:"subfunction_oper"`
-	SubfunctionAvail     string       `json:"subfunction_avail"`
-	SerialID             *string      `json:"serialid"`
-	Administrative       string       `json:"administrative"`
-	Operational          string       `json:"operational"`
-	Availability         string       `json:"availability"`
-	Action               string       `json:"action"`
-	IHostAction          string       `json:"ihost_action"`
-	InvState             string       `json:"inv_state"`
-	VIMProgressStatus    string       `json:"vim_progress_status"`
-	Task                 string       `json:"task"`
-	MtceInfo             string       `json:"mtce_info"`
-	Reserved             bool         `json:"reserved"`
-	ConfigStatus         string       `json:"config_status"`
-	ConfigApplied        string       `json:"config_applied"`
-	ConfigTarget         string       `json:"config_target"`
-	ClockSynchronization string       `json:"clock_synchronization"`
-	Uptime               int          `json:"uptime"`
-	Location             struct{}     `json:"location"`
-	Capabilities         Capabilities `json:"capabilities"`
-	ISystemUUID          string       `json:"isystem_uuid"`
-	Peers                *string      `json:"peers"`
-	Links                []Link       `json:"links"`
-	BootDevice           string       `json:"boot_device"`
-	RootFSDevice         string       `json:"rootfs_device"`
-	HWSettle             string       `json:"hw_settle"`
-	InstallOutput        string       `json:"install_output"`
-	Console              string       `json:"console"`
-	TBoot                string       `json:"tboot"`
-	TTyDCD               bool         `json:"ttys_dcd"`
-	AppArmor             string       `json:"apparmor"`
-	SoftwareLoad         string       `json:"software_load"`
-	TargetLoad           string       `json:"target_load"`
-	InstallState         *string      `json:"install_state"`
-	InstallStateInfo     *string      `json:"install_state_info"`
-	MaxCPUMhzConfigured  *int         `json:"max_cpu_mhz_configured"`
-	MaxCPUMhzAllowed     string       `json:"max_cpu_mhz_allowed"`
-	ISCSIInitiatorName   string       `json:"iscsi_initiator_name"`
-	DeviceImageUpdate    *string      `json:"device_image_update"`
-	RebootNeeded         bool         `json:"reboot_needed"`
-	CreatedAt            string       `json:"created_at"`
-	UpdatedAt            string       `json:"updated_at"`
+	ID int `json:"id"`
+	// UUID                 string       `json:"uuid"`
+	// Hostname             string       `json:"hostname"`
+	// InvProvision         string       `json:"invprovision"`
+	// MgmtMAC              string       `json:"mgmt_mac"`
+	// MgmtIP               string       `json:"mgmt_ip"`
+	// BMIP                 string       `json:"bm_ip"`
+	// BMType               string       `json:"bm_type"`
+	// BMUsername           string       `json:"bm_username"`
+	// Personality          string       `json:"personality"`
+	// Subfunctions         string       `json:"subfunctions"`
+	// SubfunctionOper      string       `json:"subfunction_oper"`
+	// SubfunctionAvail     string       `json:"subfunction_avail"`
+	// SerialID             *string      `json:"serialid"`
+	// Administrative       string       `json:"administrative"`
+	// Operational          string       `json:"operational"`
+	// Availability         string       `json:"availability"`
+	// Action               string       `json:"action"`
+	// IHostAction          string       `json:"ihost_action"`
+	// InvState             string       `json:"inv_state"`
+	// VIMProgressStatus    string       `json:"vim_progress_status"`
+	// Task                 string       `json:"task"`
+	// MtceInfo             string       `json:"mtce_info"`
+	// Reserved             bool         `json:"reserved"`
+	// ConfigStatus         string       `json:"config_status"`
+	// ConfigApplied        string       `json:"config_applied"`
+	// ConfigTarget         string       `json:"config_target"`
+	// ClockSynchronization string       `json:"clock_synchronization"`
+	// Uptime               int          `json:"uptime"`
+	// Location             struct{}     `json:"location"`
+	// Capabilities         Capabilities `json:"capabilities"`
+	// ISystemUUID          string       `json:"isystem_uuid"`
+	// Peers                *string      `json:"peers"`
+	Links []Link `json:"links"`
+	// BootDevice          string  `json:"boot_device"`
+	// RootFSDevice        string  `json:"rootfs_device"`
+	// HWSettle            string  `json:"hw_settle"`
+	// InstallOutput       string  `json:"install_output"`
+	// Console             string  `json:"console"`
+	// TBoot               string  `json:"tboot"`
+	// TTyDCD              bool    `json:"ttys_dcd"`
+	// AppArmor            string  `json:"apparmor"`
+	// SoftwareLoad        string  `json:"software_load"`
+	// TargetLoad          string  `json:"target_load"`
+	// InstallState        *string `json:"install_state"`
+	// InstallStateInfo    *string `json:"install_state_info"`
+	// MaxCPUMhzConfigured *int    `json:"max_cpu_mhz_configured"`
+	// MaxCPUMhzAllowed    string  `json:"max_cpu_mhz_allowed"`
+	// ISCSIInitiatorName  string  `json:"iscsi_initiator_name"`
+	// DeviceImageUpdate   *string `json:"device_image_update"`
+	// RebootNeeded        bool    `json:"reboot_needed"`
+	// CreatedAt           string  `json:"created_at"`
+	// UpdatedAt           string  `json:"updated_at"`
 }
 
 type Capabilities struct {

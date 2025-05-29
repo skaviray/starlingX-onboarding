@@ -11,7 +11,8 @@ import (
 )
 
 func main() {
-	config, err := utils.LoadConfig("/app/")
+	// config, err := utils.LoadConfig("/app/")
+	config, err := utils.LoadConfig("./")
 	if err != nil {
 		log.Fatalf("unable to load the config file %e", err)
 	}
